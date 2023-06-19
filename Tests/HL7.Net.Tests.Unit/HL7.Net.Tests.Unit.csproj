@@ -27,4 +27,9 @@
     <ProjectReference Include="..\..\Source\HL7.Net\HL7.Net.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="V2Point2\CompositeTypes\" />
+    <Folder Include="V2Point2\Tables\" />
+  </ItemGroup>
+
 </Project>

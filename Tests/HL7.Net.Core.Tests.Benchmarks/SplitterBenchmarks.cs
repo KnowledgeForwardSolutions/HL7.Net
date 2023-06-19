@@ -11,27 +11,27 @@ public class SplitterBenchmarks
       PV1|1|I|2000^2012^01||||004777^ATTEND^AARON^A|||SUR||||ADM|A0|
       """;
 
-   [Benchmark]
-   public void SpanAndSubranges()
-   {
-      var subranges = AdmitPatientMessage.SplitLines();
-   }
+   //[Benchmark]
+   //public void SpanAndSubranges()
+   //{
+   //   var subranges = AdmitPatientMessage.SplitLines();
+   //}
 
-   [Benchmark]
-   public void SpanEnumerator()
-   {
-      foreach (var line in AdmitPatientMessage.SplitLines2())
-      {
+   //[Benchmark]
+   //public void SpanEnumerator()
+   //{
+   //   foreach (var line in AdmitPatientMessage.SplitLines2())
+   //   {
 
-      }
-   }
+   //   }
+   //}
 
-   [Benchmark]
-   public void SpanEnumeratorWithText()
-   {
-      foreach (var line in AdmitPatientMessage.SplitLines2())
-      {
-         var contents = line.ToString();
-      }
-   }
+   //[Benchmark]
+   //public void SpanEnumeratorWithText()
+   //{
+   //   foreach (var line in AdmitPatientMessage.SplitLines2())
+   //   {
+   //      var contents = line.ToString();
+   //   }
+   //}
 }
