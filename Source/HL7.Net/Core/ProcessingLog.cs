@@ -27,51 +27,76 @@ public class ProcessingLog : IEnumerable<LogEntry>
    /// </summary>
    public IEnumerator<LogEntry> GetEnumerator() => _logs.GetEnumerator();
 
-   public void LogInformation(
+   internal void LogError(
       String message,
       Int32 lineNumber,
-      String? segmentID = null,
-      Int32? fieldNumber = null,
-      String? rawData = null)
-      => _logs.Add(new LogEntry(LogLevel.Information, message, lineNumber, segmentID, fieldNumber, rawData));
-
-   public void LogError(
-      String message,
-      Int32 lineNumber,
-      String? segmentID = null,
-      Int32? fieldNumber = null,
+      FieldSpecification? fieldSpecification = null,
       String? rawData = null)
    {
-      _logs.Add(new LogEntry(LogLevel.Error, message, lineNumber, segmentID, fieldNumber, rawData));
-      if ((Int32) HighestLogLevel < (Int32) LogLevel.Error)
+      _logs.Add(new LogEntry(LogLevel.Error, message, lineNumber, fieldSpecification?.FieldDescription, rawData));
+      if (HighestLogLevel < LogLevel.Error)
       {
          HighestLogLevel = LogLevel.Error;
       }
    }
 
-   public void LogFatalError(
+   internal void LogFatalError(
       String message,
       Int32 lineNumber,
-      String? segmentID = null,
-      Int32? fieldNumber = null,
+      FieldSpecification? fieldSpecification = null,
       String? rawData = null)
    {
-      _logs.Add(new LogEntry(LogLevel.FatalError, message, lineNumber, segmentID, fieldNumber, rawData));
-      if ((Int32)HighestLogLevel < (Int32)LogLevel.FatalError)
+      _logs.Add(new LogEntry(LogLevel.FatalError, message, lineNumber, fieldSpecification?.FieldDescription, rawData));
+      if (HighestLogLevel < LogLevel.FatalError)
       {
          HighestLogLevel = LogLevel.FatalError;
       }
    }
 
-   public void LogWarning(
+   internal void LogFieldNotPresent(Int32 lineNumber, FieldSpecification fieldSpecification)
+   {
+      String message;
+      if (fieldSpecification.Optionality == Optionality.Required)
+      {
+         message = String.Format(Messages.LogRequiredFieldNotPresent, fieldSpecification.FieldDescription);
+         LogError(message, lineNumber, fieldSpecification);
+         return;
+      }
+
+      message = String.Format(Messages.LogFieldNotPresent, fieldSpecification.FieldDescription);
+      LogInformation(message, lineNumber, fieldSpecification);
+   }
+
+   internal void LogFieldPresent(
+      Int32 lineNumber,
+      FieldSpecification fieldSpecification,
+      ReadOnlySpan<Char> fieldContents)
+   {
+      var message = String.Format(Messages.LogFieldPresent, fieldSpecification.FieldDescription);
+      LogInformation(message, lineNumber, fieldSpecification, fieldContents.ToString());
+   }
+
+   internal void LogFieldPresentButNull(Int32 lineNumber, FieldSpecification fieldSpecification)
+   {
+      var message = String.Format(Messages.LogFieldPresentButNull, fieldSpecification.FieldDescription);
+      LogInformation(message, lineNumber, fieldSpecification, "\"\"");
+   }
+
+   internal void LogInformation(
       String message,
       Int32 lineNumber,
-      String? segmentID = null,
-      Int32? fieldNumber = null,
+      FieldSpecification? fieldSpecification = null,
+      String? rawData = null)
+      => _logs.Add(new LogEntry(LogLevel.Information, message, lineNumber, fieldSpecification?.FieldDescription, rawData));
+
+   internal void LogWarning(
+      String message,
+      Int32 lineNumber,
+      FieldSpecification? fieldSpecification = null,
       String? rawData = null)
    {
-      _logs.Add(new LogEntry(LogLevel.Warning, message, lineNumber, segmentID, fieldNumber, rawData));
-      if ((Int32)HighestLogLevel < (Int32)LogLevel.Warning)
+      _logs.Add(new LogEntry(LogLevel.Warning, message, lineNumber, fieldSpecification?.FieldDescription, rawData));
+      if (HighestLogLevel < LogLevel.Warning)
       {
          HighestLogLevel = LogLevel.Warning;
       }

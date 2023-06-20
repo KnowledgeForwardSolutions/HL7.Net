@@ -129,6 +129,24 @@
   <data name="InvalidRepetitionSpecification" xml:space="preserve">
     <value>Value is not 'N', 'Y' or a integer greater than one (1)</value>
   </data>
+  <data name="LogDuplicateEncodingCharacter" xml:space="preserve">
+    <value>Field {0} has duplicate encoding character {1}</value>
+  </data>
+  <data name="LogFieldInvalidLength" xml:space="preserve">
+    <value>Field {0} has invalid length</value>
+  </data>
+  <data name="LogFieldNotPresent" xml:space="preserve">
+    <value>Field {0} is not present</value>
+  </data>
+  <data name="LogFieldPresent" xml:space="preserve">
+    <value>Field {0} is present</value>
+  </data>
+  <data name="LogFieldPresentButNull" xml:space="preserve">
+    <value>Field {0} is present but null</value>
+  </data>
+  <data name="LogRequiredFieldNotPresent" xml:space="preserve">
+    <value>Required field {0} is not present</value>
+  </data>
   <data name="StringValueIsNullOrWhiteSpace" xml:space="preserve">
     <value>Value is null, String.Empty or all whitespace characters</value>
   </data>

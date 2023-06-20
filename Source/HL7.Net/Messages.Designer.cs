@@ -97,6 +97,60 @@ namespace HL7.Net {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Field {0} has duplicate encoding character {1}.
+        /// </summary>
+        internal static string LogDuplicateEncodingCharacter {
+            get {
+                return ResourceManager.GetString("LogDuplicateEncodingCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Field {0} has invalid length.
+        /// </summary>
+        internal static string LogFieldInvalidLength {
+            get {
+                return ResourceManager.GetString("LogFieldInvalidLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Field {0} is not present.
+        /// </summary>
+        internal static string LogFieldNotPresent {
+            get {
+                return ResourceManager.GetString("LogFieldNotPresent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Field {0} is present.
+        /// </summary>
+        internal static string LogFieldPresent {
+            get {
+                return ResourceManager.GetString("LogFieldPresent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Field {0} is present but null.
+        /// </summary>
+        internal static string LogFieldPresentButNull {
+            get {
+                return ResourceManager.GetString("LogFieldPresentButNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Required field {0} is not present.
+        /// </summary>
+        internal static string LogRequiredFieldNotPresent {
+            get {
+                return ResourceManager.GetString("LogRequiredFieldNotPresent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value is null, String.Empty or all whitespace characters.
         /// </summary>
         internal static string StringValueIsNullOrWhiteSpace {

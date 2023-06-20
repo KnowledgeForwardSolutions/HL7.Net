@@ -1,29 +1,27 @@
 ﻿namespace HL7.Net.Core;
 
 /// <summary>
-///   A field containing a string. String data is left justified and trailing
-///   blanks are preserved.
+///   A field containing string data. Implements HL7 V2.2 spec section 2.8.10.1.
+///   String data is left justified and trailing blanks are preserved.
 /// </summary>
 public sealed record StringField
 {
    /// <summary>
    ///   Represents a string field that is not present.
    /// </summary>
-   public static readonly StringField NotPresent = new(null, null, FieldPresence.NotPresent);
+   public static readonly StringField NotPresent = new(null, FieldPresence.NotPresent);
 
    /// <summary>
    ///   Represents a string field that is present but is null.
    /// </summary>
-   public static readonly StringField PresentButNull = new(null, "\"\"", FieldPresence.PresentButNull);
+   public static readonly StringField PresentButNull = new(null, FieldPresence.PresentButNull);
 
    internal StringField(
       String? value,
-      String? rawValue = null,
       FieldPresence fieldPresence = FieldPresence.Present)
    {
       Value = value;
       FieldPresence = fieldPresence;
-      RawValue = rawValue;
    }
 
    public static implicit operator String?(StringField field) => field.Value;
@@ -33,11 +31,6 @@ public sealed record StringField
    ///   the field is null or not.
    /// </summary>
    public FieldPresence FieldPresence { get; init; }
-
-   /// <summary>
-   ///   The raw text value for this field that was read from an HL7 message.
-   /// </summary>
-   public String? RawValue { get; init; }
 
    /// <summary>
    ///   The value of this field.
@@ -53,21 +46,14 @@ public sealed record StringField
    {
       if (!fieldEnumerator.MoveNext() || fieldEnumerator.Current.IsEmpty)
       {
-         if (fieldSpecification.Optionality == Optionality.Required)
-         {
-            log.LogError(
-               $"Missing required field - {fieldSpecification.FieldName}",
-               lineNumber,
-               fieldSpecification.SegmentID,
-               fieldSpecification.Sequence);
-         }
-
+         log.LogFieldNotPresent(lineNumber, fieldSpecification);
          return StringField.NotPresent;
       }
 
       var fieldContents = fieldEnumerator.Current;
       if (fieldContents.Length == 2 && fieldContents[0] == '"' && fieldContents[1] == '"')
       {
+         log.LogFieldPresentButNull(lineNumber, fieldSpecification);
          return StringField.PresentButNull;
       }
 
@@ -77,11 +63,11 @@ public sealed record StringField
          log.LogWarning(
             $"String value truncated to field maximum length ({fieldSpecification.Length})",
             lineNumber,
-            fieldSpecification.SegmentID,
-            fieldSpecification.Sequence);
+            fieldSpecification,
+            raw);
       }
-      return new StringField(
-         raw.Length > fieldSpecification.Length ? raw[..fieldSpecification.Length] : raw,
-         raw);
+      return new StringField(raw.Length > fieldSpecification.Length 
+         ? raw[..fieldSpecification.Length] 
+         : raw);
    }
 }
