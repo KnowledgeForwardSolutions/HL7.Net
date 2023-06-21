@@ -142,6 +142,15 @@ namespace HL7.Net {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Field {0} is present but was truncated to field max length of {1}.
+        /// </summary>
+        internal static string LogFieldPresentButTruncated {
+            get {
+                return ResourceManager.GetString("LogFieldPresentButTruncated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Required field {0} is not present.
         /// </summary>
         internal static string LogRequiredFieldNotPresent {

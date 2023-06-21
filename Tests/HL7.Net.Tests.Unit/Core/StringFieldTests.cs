@@ -12,7 +12,7 @@ public class StringFieldTests
       "TST",
       1,
       "Test Field",
-      15,
+      42,
       HL7Datatype.ST_String,
       Optionality.Optional,
       "N");
@@ -23,38 +23,15 @@ public class StringFieldTests
    // ==========================================================================
 
    [Fact]
-   public void StringField_Constructor_ShouldReturnNotPresentInstance_WhenFieldIsEmpty()
+   public void StringField_Constructor_ShouldReturnExpectedField_WhenFieldIsNotEmpty()
    {
       // Arrange.
-      var line = "TST||This is a test..".AsSpan();
+      var line = "TST|This is a test...|This is only a test...|For the next sixty seconds...".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      // Act.
-      var field = StringField.Parse(
-         ref fieldEnumerator, 
-         _encodingDetails, 
-         _fieldSpecification, 
-         _lineNumber,
-         log);
-
-      // Assert.
-      field.Should().Be(StringField.NotPresent);
-   }
-
-   [Fact]
-   public void StringField_Constructor_ShouldLogNotPresentField_WhenFieldIsEmpty()
-   {
-      // Arrange.
-      var line = "TST||This is a test..".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator);
-      fieldEnumerator.MoveNext();
-      var log = new ProcessingLog();
-
-      var expectedLogMessage = String.Format(
-         Messages.LogFieldNotPresent,
-         _fieldSpecification.FieldDescription);
+      var expected = new StringField("This is a test...");
 
       // Act.
       var field = StringField.Parse(
@@ -65,13 +42,184 @@ public class StringFieldTests
          log);
 
       // Assert.
+      field.Should().Be(expected);
+   }
+
+   [Fact]
+   public void StringField_Constructor_ShouldLogExpectedEntry_WhenFieldIsNotEmpty()
+   {
+      // Arrange.
+      var line = "TST|This is a test...|This is only a test...|For the next sixty seconds...".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+
+      var message = String.Format(Messages.LogFieldPresent, _fieldSpecification.FieldDescription);
+
+      var expectedLogEntry = new LogEntry(
+         LogLevel.Information,
+         message,
+         _lineNumber,
+         _fieldSpecification.FieldDescription,
+         "This is a test...");
+
+      // Act.
+      _ = StringField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         _fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
       log.Should().HaveCount(1);
-      var entry = log.First();
-      entry.LogLevel.Should().Be(LogLevel.Information);
-      entry.Message.Should().Be(expectedLogMessage);
-      entry.FieldDescription.Should().Be(_fieldSpecification.FieldDescription);
-      entry.LineNumber.Should().Be(_lineNumber);
-      entry.RawData.Should().BeNull();
+      log.First().Should().Be(expectedLogEntry);
+   }
+
+   [Fact]
+   public void StringField_Constructor_ShouldReturnExpectedField_WhenRawDataExceedsFieldLength()
+   {
+      // Arrange.
+      var line = "TST|This is a test...|This is only a test...|For the next sixty seconds...".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+      var fieldSpecification = _fieldSpecification with { Length = 10 };
+
+      var expected = new StringField("This is a ");
+
+      // Act.
+      var field = StringField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      field.Should().Be(expected);
+   }
+
+   [Fact]
+   public void StringField_Constructor_ShouldLogExpectedEntry_WhenRawDataExceedsFieldLength()
+   {
+      // Arrange.
+      var line = "TST|This is a test...|This is only a test...|For the next sixty seconds...".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+      var fieldSpecification = _fieldSpecification with { Length = 10 };
+
+      var message = String.Format(
+         Messages.LogFieldPresentButTruncated, 
+         fieldSpecification.FieldDescription,
+         fieldSpecification.Length);
+
+      var expectedLogEntry = new LogEntry(
+         LogLevel.Warning,
+         message,
+         _lineNumber,
+         _fieldSpecification.FieldDescription,
+         "This is a test...");
+
+      // Act.
+      _ = StringField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      log.Should().HaveCount(1);
+      log.First().Should().Be(expectedLogEntry);
+   }
+
+   [Theory]
+   [InlineData(Optionality.Optional)]
+   [InlineData(Optionality.Required)]
+   public void StringField_Constructor_ShouldReturnNotPresentInstance_WhenFieldIsEmpty(Optionality optionality)
+   {
+      // Arrange.
+      var line = "TST||This is a test..".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+      var fieldSpecification = _fieldSpecification with { Optionality = optionality };
+
+      // Act.
+      var field = StringField.Parse(
+         ref fieldEnumerator, 
+         _encodingDetails,
+         fieldSpecification, 
+         _lineNumber,
+         log);
+
+      // Assert.
+      field.Should().Be(StringField.NotPresent);
+   }
+
+   [Fact]
+   public void StringField_Constructor_ShouldLogExpectedEntry_WhenOptionalFieldIsEmpty()
+   {
+      // Arrange.
+      var line = "TST||This is a test..".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+
+      var message = String.Format(
+         Messages.LogFieldNotPresent,
+         _fieldSpecification.FieldDescription);
+      var expectedLogEntry = new LogEntry(
+         LogLevel.Information,
+         message,
+         _lineNumber,
+         _fieldSpecification.FieldDescription);
+
+      // Act.
+      _ = StringField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         _fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      log.Should().HaveCount(1);
+      log.First().Should().Be(expectedLogEntry);
+   }
+
+   [Fact]
+   public void StringField_Constructor_ShouldLogExpectedEntry_WhenRequiredFieldIsEmpty()
+   {
+      // Arrange.
+      var line = "TST||This is a test..".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+
+      var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Required };
+      var message = String.Format(
+         Messages.LogRequiredFieldNotPresent,
+         _fieldSpecification.FieldDescription);
+      var expectedLogEntry = new LogEntry(
+         LogLevel.Error,
+         message,
+         _lineNumber,
+         fieldSpecification.FieldDescription);
+
+      // Act.
+      _ = StringField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      log.Should().HaveCount(1);
+      log.First().Should().Be(expectedLogEntry);
    }
 
    [Fact]
@@ -96,7 +244,7 @@ public class StringFieldTests
    }
 
    [Fact]
-   public void StringField_Constructor_ShouldLogPresentButNullField_WhenFieldIsTwoDoubleQuotes()
+   public void StringField_Constructor_ShouldLogExpectedEntry_WhenFieldIsTwoDoubleQuotes()
    {
       // Arrange.
       var line = "TST|\"\"|This is a test..".AsSpan();
@@ -104,10 +252,47 @@ public class StringFieldTests
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      var expectedLogMessage = String.Format(
+      var message = String.Format(
          Messages.LogFieldPresentButNull,
          _fieldSpecification.FieldDescription);
-      var expectedRawData = "\"\"";
+      var rawData = "\"\"";
+      var expectedLogEntry = new LogEntry(
+         LogLevel.Information,
+         message,
+         _lineNumber,
+         _fieldSpecification.FieldDescription,
+         rawData);
+
+      // Act.
+      _ = StringField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         _fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      log.Should().HaveCount(1);
+      log.First().Should().Be(expectedLogEntry);
+   }
+
+   [Theory]
+   [InlineData('^')]
+   [InlineData('~')]
+   [InlineData('\\')]
+   [InlineData('&')]
+   [InlineData('|')]
+   public void StringField_Constructor_ShouldReturnExpectedField_WhenRawDataContainsEscapedCharacters(Char escapedChar)
+   {
+      // Arrange.
+      var line = $"TST|This is a test{_encodingDetails.EscapeCharacter}{escapedChar}This is only a test|abc|qwerty".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+
+      var expectedValue = $"This is a test{escapedChar}This is only a test";
+
+      var expected = new StringField(expectedValue);
 
       // Act.
       var field = StringField.Parse(
@@ -118,13 +303,111 @@ public class StringFieldTests
          log);
 
       // Assert.
+      field.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData('^')]
+   [InlineData('~')]
+   [InlineData('\\')]
+   [InlineData('&')]
+   [InlineData('|')]
+   public void StringField_Constructor_ShouldLogExpectedEntry_WhenRawDataContainsEscapedCharacters(Char escapedChar)
+   {
+      // Arrange.
+      var line = $"TST|This is a test{_encodingDetails.EscapeCharacter}{escapedChar}This is only a test|abc|qwerty".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+
+      var message = String.Format(Messages.LogFieldPresent, _fieldSpecification.FieldDescription);
+
+      var expectedLogEntry = new LogEntry(
+         LogLevel.Information,
+         message,
+         _lineNumber,
+         _fieldSpecification.FieldDescription,
+         $"This is a test{_encodingDetails.EscapeCharacter}{escapedChar}This is only a test");
+
+      // Act.
+      _ = StringField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         _fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
       log.Should().HaveCount(1);
-      var entry = log.First();
-      entry.LogLevel.Should().Be(LogLevel.Information);
-      entry.Message.Should().Be(expectedLogMessage);
-      entry.FieldDescription.Should().Be(_fieldSpecification.FieldDescription);
-      entry.LineNumber.Should().Be(_lineNumber);
-      entry.RawData.Should().Be(expectedRawData);
+      log.First().Should().Be(expectedLogEntry);
+   }
+
+   [Theory]
+   [InlineData('^')]
+   [InlineData('~')]
+   [InlineData('\\')]
+   [InlineData('&')]
+   [InlineData('|')]
+   public void StringField_Constructor_ShouldReturnExpectedField_WhenRawDataContainsEscapedCharactersAndDecodedValueExceedsFieldMaxLength(Char escapedChar)
+   {
+      // Arrange.
+      var line = $"TST|This is a test{_encodingDetails.EscapeCharacter}{escapedChar}This is only a test|abc|qwerty".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+      var fieldSpecification = _fieldSpecification with { Length = 20 };
+
+      var expectedValue = $"This is a test{escapedChar}This ";
+
+      var expected = new StringField(expectedValue);
+
+      // Act.
+      var field = StringField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      field.Should().Be(expected);
+   }
+
+   [Theory]
+   [InlineData('^')]
+   [InlineData('~')]
+   [InlineData('\\')]
+   [InlineData('&')]
+   [InlineData('|')]
+   public void StringField_Constructor_ShouldLogExpectedEntry_WhenRawDataContainsEscapedCharactersAndDecodedValueExceedsFieldMaxLength(Char escapedChar)
+   {
+      // Arrange.
+      var line = $"TST|This is a test{_encodingDetails.EscapeCharacter}{escapedChar}This is only a test|abc|qwerty".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+      var fieldSpecification = _fieldSpecification with { Length = 20 };
+
+      var message = String.Format(Messages.LogFieldPresent, _fieldSpecification.FieldDescription);
+
+      var expectedLogEntry = new LogEntry(
+         LogLevel.Information,
+         message,
+         _lineNumber,
+         _fieldSpecification.FieldDescription,
+         $"This is a test{_encodingDetails.EscapeCharacter}{escapedChar}This is only a test");
+
+      // Act.
+      _ = StringField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         _fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      log.Should().HaveCount(1);
+      log.First().Should().Be(expectedLogEntry);
    }
 
    #endregion

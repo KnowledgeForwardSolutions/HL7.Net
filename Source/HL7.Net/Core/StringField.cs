@@ -57,17 +57,22 @@ public sealed record StringField
          return StringField.PresentButNull;
       }
 
-      var raw = fieldContents.ToString();
-      if (raw.Length > fieldSpecification.Length)
+      var decoded = fieldContents.GetDecodedString(encodingDetails);
+      if (decoded.Length > fieldSpecification.Length)
       {
+         var message = String.Format(
+            Messages.LogFieldPresentButTruncated,
+            fieldSpecification.FieldDescription,
+            fieldSpecification.Length);
          log.LogWarning(
-            $"String value truncated to field maximum length ({fieldSpecification.Length})",
+            message,
             lineNumber,
             fieldSpecification,
-            raw);
+            fieldContents.ToString());
+         return new StringField(decoded[..fieldSpecification.Length]);
       }
-      return new StringField(raw.Length > fieldSpecification.Length 
-         ? raw[..fieldSpecification.Length] 
-         : raw);
+
+      log.LogFieldPresent(lineNumber, fieldSpecification, fieldContents);
+      return new StringField(decoded);
    }
 }

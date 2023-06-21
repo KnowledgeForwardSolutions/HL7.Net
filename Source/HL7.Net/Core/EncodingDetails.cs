@@ -20,8 +20,20 @@
 ///   Separates adjacent subcomponents of data fields.
 /// </param>
 internal record EncodingDetails(
-      Char FieldSeparator,
-      Char ComponentSeparator,
-      Char RepetitionSeparator,
-      Char EscapeCharacter,
-      Char SubComponentSeparator);
+   Char FieldSeparator,
+   Char ComponentSeparator,
+   Char RepetitionSeparator,
+   Char EscapeCharacter,
+   Char SubComponentSeparator)
+{
+   public IEnumerable<Char> AllSeparators 
+   {
+      get
+      {
+         yield return ComponentSeparator;
+         yield return RepetitionSeparator;
+         yield return SubComponentSeparator;
+         yield return EscapeCharacter;
+      }
+   }
+}

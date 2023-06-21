@@ -36,5 +36,5 @@ internal record FieldSpecification(
    Optionality Optionality,
    Repetition Repetition)
 {
-   public String FieldDescription { get; init; } = $"{SegmentID}.{Sequence}/{FieldName}";
+   public String FieldDescription { get; private init; } = $"{SegmentID}.{Sequence}/{FieldName}";
 }

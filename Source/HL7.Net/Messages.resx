@@ -144,6 +144,9 @@
   <data name="LogFieldPresentButNull" xml:space="preserve">
     <value>Field {0} is present but null</value>
   </data>
+  <data name="LogFieldPresentButTruncated" xml:space="preserve">
+    <value>Field {0} is present but was truncated to field max length of {1}</value>
+  </data>
   <data name="LogRequiredFieldNotPresent" xml:space="preserve">
     <value>Required field {0} is not present</value>
   </data>
