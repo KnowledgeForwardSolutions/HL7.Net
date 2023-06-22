@@ -2,12 +2,7 @@
 
 public class StringFieldTests
 {
-   private static readonly EncodingDetails _encodingDetails = new(
-      DefaultSeparators.FieldSeparator,
-      DefaultSeparators.ComponentSeparator,
-      DefaultSeparators.RepetitionSeparator,
-      DefaultSeparators.EscapeCharacter,
-      DefaultSeparators.SubComponentSeparator);
+   private static readonly EncodingDetails _encodingDetails = EncodingDetails.DefaultEncodingDetails;
    private static readonly FieldSpecification _fieldSpecification = new(
       "TST",
       1,
@@ -277,11 +272,11 @@ public class StringFieldTests
    }
 
    [Theory]
-   [InlineData('^')]
-   [InlineData('~')]
-   [InlineData('\\')]
-   [InlineData('&')]
-   [InlineData('|')]
+   [InlineData(DefaultSeparators.FieldSeparator)]
+   [InlineData(DefaultSeparators.ComponentSeparator)]
+   [InlineData(DefaultSeparators.RepetitionSeparator)]
+   [InlineData(DefaultSeparators.EscapeCharacter)]
+   [InlineData(DefaultSeparators.SubComponentSeparator)]
    public void StringField_Constructor_ShouldReturnExpectedField_WhenRawDataContainsEscapedCharacters(Char escapedChar)
    {
       // Arrange.
@@ -307,11 +302,11 @@ public class StringFieldTests
    }
 
    [Theory]
-   [InlineData('^')]
-   [InlineData('~')]
-   [InlineData('\\')]
-   [InlineData('&')]
-   [InlineData('|')]
+   [InlineData(DefaultSeparators.FieldSeparator)]
+   [InlineData(DefaultSeparators.ComponentSeparator)]
+   [InlineData(DefaultSeparators.RepetitionSeparator)]
+   [InlineData(DefaultSeparators.EscapeCharacter)]
+   [InlineData(DefaultSeparators.SubComponentSeparator)]
    public void StringField_Constructor_ShouldLogExpectedEntry_WhenRawDataContainsEscapedCharacters(Char escapedChar)
    {
       // Arrange.
@@ -343,11 +338,11 @@ public class StringFieldTests
    }
 
    [Theory]
-   [InlineData('^')]
-   [InlineData('~')]
-   [InlineData('\\')]
-   [InlineData('&')]
-   [InlineData('|')]
+   [InlineData(DefaultSeparators.FieldSeparator)]
+   [InlineData(DefaultSeparators.ComponentSeparator)]
+   [InlineData(DefaultSeparators.RepetitionSeparator)]
+   [InlineData(DefaultSeparators.EscapeCharacter)]
+   [InlineData(DefaultSeparators.SubComponentSeparator)]
    public void StringField_Constructor_ShouldReturnExpectedField_WhenRawDataContainsEscapedCharactersAndDecodedValueExceedsFieldMaxLength(Char escapedChar)
    {
       // Arrange.
@@ -374,11 +369,11 @@ public class StringFieldTests
    }
 
    [Theory]
-   [InlineData('^')]
-   [InlineData('~')]
-   [InlineData('\\')]
-   [InlineData('&')]
-   [InlineData('|')]
+   [InlineData(DefaultSeparators.FieldSeparator)]
+   [InlineData(DefaultSeparators.ComponentSeparator)]
+   [InlineData(DefaultSeparators.RepetitionSeparator)]
+   [InlineData(DefaultSeparators.EscapeCharacter)]
+   [InlineData(DefaultSeparators.SubComponentSeparator)]
    public void StringField_Constructor_ShouldLogExpectedEntry_WhenRawDataContainsEscapedCharactersAndDecodedValueExceedsFieldMaxLength(Char escapedChar)
    {
       // Arrange.

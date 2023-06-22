@@ -2,9 +2,9 @@
 
 public static class SpanExtensions
 {
-   public static LineEnumerator ToLines(this ReadOnlySpan<Char> span) => new(span);
-
    public static FieldEnumerator ToFields(this ReadOnlySpan<Char> span, Char separator) => new(span, separator);
+
+   public static LineEnumerator ToLines(this ReadOnlySpan<Char> span) => new(span);
 
    /// <summary>
    ///   Given a span of characters, which may or may not contain escape
@@ -25,20 +25,18 @@ public static class SpanExtensions
       this ReadOnlySpan<Char> span,
       EncodingDetails encodingDetails)
    {
-      var raw = span.ToString();
-      String decoded = null!;
+      var decoded = span.ToString();
       foreach (var ch in encodingDetails.AllSeparators)
       {
          if (span.IndexOf(ch) != -1)
          {
             var escapedSequence = $"{encodingDetails.EscapeCharacter}{ch}";
             var replaceWith = new String(ch, 1);
-            decoded ??= span.ToString();
             decoded = decoded.Replace(escapedSequence, replaceWith);
          }
       }
       
-      return decoded ??= raw;
+      return decoded;
    }
 
    /// <summary>

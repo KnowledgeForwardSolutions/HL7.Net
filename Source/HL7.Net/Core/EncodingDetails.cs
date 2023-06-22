@@ -30,10 +30,22 @@ internal record EncodingDetails(
    {
       get
       {
+         yield return FieldSeparator;
          yield return ComponentSeparator;
          yield return RepetitionSeparator;
          yield return SubComponentSeparator;
          yield return EscapeCharacter;
       }
    }
+
+   /// <summary>
+   ///   <see cref="EncodingDetails"/> instance using the default encoding
+   ///   characters recommended by the HL7 specification.
+   /// </summary>
+   public static readonly EncodingDetails DefaultEncodingDetails = new EncodingDetails(
+         DefaultSeparators.FieldSeparator,
+         DefaultSeparators.ComponentSeparator,
+         DefaultSeparators.RepetitionSeparator,
+         DefaultSeparators.EscapeCharacter,
+         DefaultSeparators.SubComponentSeparator);
 }
