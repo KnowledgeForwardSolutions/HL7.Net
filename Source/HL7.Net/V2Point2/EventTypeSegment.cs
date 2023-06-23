@@ -56,7 +56,9 @@ public class EventTypeSegment : ISegment
 
       // Enumerate the fields and skip over the first field which contains the
       // segment ID.
-      var fieldEnumerator = segmentText.ToFields(encodingDetails.FieldSeparator);
+      var fieldEnumerator = segmentText.ToFields(
+         encodingDetails.FieldSeparator,
+         encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
 
       segment.EventTypeCode = StringField.Parse(

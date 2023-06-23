@@ -46,8 +46,7 @@ public sealed record FieldSeparatorField
          log.LogFatalError(
             $"Missing required field - {fieldSpecification.FieldName}",
             lineNumber,
-            fieldSpecification.SegmentID,
-            fieldSpecification.Sequence);
+            fieldSpecification);
          return new FieldSeparatorField('\0', null, FieldPresence.NotPresent);
       }
 

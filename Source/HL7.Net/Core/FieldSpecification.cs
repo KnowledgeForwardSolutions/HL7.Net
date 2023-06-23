@@ -34,4 +34,7 @@ internal record FieldSpecification(
    Int32 Length,
    HL7Datatype Datatype,
    Optionality Optionality,
-   Repetition Repetition);
+   Repetition Repetition)
+{
+   public String FieldDescription { get; private init; } = $"{SegmentID}.{Sequence}/{FieldName}";
+}

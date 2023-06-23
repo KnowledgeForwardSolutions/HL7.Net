@@ -20,8 +20,32 @@
 ///   Separates adjacent subcomponents of data fields.
 /// </param>
 internal record EncodingDetails(
-      Char FieldSeparator,
-      Char ComponentSeparator,
-      Char RepetitionSeparator,
-      Char EscapeCharacter,
-      Char SubComponentSeparator);
+   Char FieldSeparator,
+   Char ComponentSeparator,
+   Char RepetitionSeparator,
+   Char EscapeCharacter,
+   Char SubComponentSeparator)
+{
+   public IEnumerable<Char> AllSeparators 
+   {
+      get
+      {
+         yield return FieldSeparator;
+         yield return ComponentSeparator;
+         yield return RepetitionSeparator;
+         yield return SubComponentSeparator;
+         yield return EscapeCharacter;
+      }
+   }
+
+   /// <summary>
+   ///   <see cref="EncodingDetails"/> instance using the default encoding
+   ///   characters recommended by the HL7 specification.
+   /// </summary>
+   public static readonly EncodingDetails DefaultEncodingDetails = new EncodingDetails(
+         DefaultSeparators.FieldSeparator,
+         DefaultSeparators.ComponentSeparator,
+         DefaultSeparators.RepetitionSeparator,
+         DefaultSeparators.EscapeCharacter,
+         DefaultSeparators.SubComponentSeparator);
+}

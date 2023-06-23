@@ -83,8 +83,7 @@ public sealed class HL7Message : IHL7Message
    {
       log.LogError(
          "Unrecognized segment ID",
-         lineNumber,
-         segmentID: segmentID);
+         lineNumber);
 
       return null!;
    }

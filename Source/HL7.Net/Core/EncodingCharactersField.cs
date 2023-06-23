@@ -59,25 +59,19 @@ public sealed record EncodingCharactersField
       Int32 lineNumber,
       ProcessingLog log)
    {
+      String message;
       if (!fieldEnumerator.MoveNext())
       {
-         log.LogFatalError(
-            $"Missing required field - {fieldSpecification.FieldName}",
-            lineNumber,
-            fieldSpecification.SegmentID,
-            fieldSpecification.Sequence);
+         message = String.Format(Messages.LogRequiredFieldNotPresent, fieldSpecification.FieldDescription);
+         log.LogFatalError(message, lineNumber, fieldSpecification);
          return new EncodingCharactersField('\0', '\0', '\0', '\0', null);
       }
 
       var fieldContents = fieldEnumerator.Current;
       if (fieldContents.Length < 2 || fieldContents.Length > 4)
       {
-         log.LogFatalError(
-            $"{fieldSpecification.FieldName} field - invalid length",
-            lineNumber,
-            fieldSpecification.SegmentID,
-            fieldSpecification.Sequence,
-            fieldContents.ToString());
+         message = String.Format(Messages.LogFieldInvalidLength, fieldSpecification.FieldDescription);
+         log.LogFatalError(message, lineNumber, fieldSpecification);
          return new EncodingCharactersField('\0', '\0', '\0', '\0', null);
       }
 
@@ -88,17 +82,18 @@ public sealed record EncodingCharactersField
          var ch = fieldContents[index];
          if (previousCharacters.Contains(ch))
          {
-            log.LogFatalError(
-               $"{fieldSpecification.FieldName} field - duplicate encoding character",
-               lineNumber,
-               fieldSpecification.SegmentID,
-               fieldSpecification.Sequence,
-               fieldContents.ToString());
+            message = String.Format(
+               Messages.LogDuplicateEncodingCharacter,
+               fieldSpecification.FieldDescription,
+               ch);
+            log.LogFatalError(message, lineNumber, fieldSpecification, fieldContents.ToString());
             return new EncodingCharactersField('\0', '\0', '\0', '\0', null);
          }
          previousCharacters.Add(ch);
          characters[index] = ch;
       }
+
+      log.LogFieldPresent(lineNumber, fieldSpecification, fieldContents);
 
       return new EncodingCharactersField(
          characters[0],
