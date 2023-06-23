@@ -1,10 +1,13 @@
-﻿namespace HL7.Net.Tests.Unit.Core;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace HL7.Net.Tests.Unit.Core;
 
 public class FieldEnumeratorTests
 {
    private const String _nextOfKinSegment = "NK1|1|NUCLEAR^NELDA^W|SPO^SPOUSE||||NK^NEXT OF KIN";
    private const Char _fieldSeparator = '|';
    private const Char _subfieldSeparator = '^';
+   private const Char _escapeCharacter = '\\';
 
    private static readonly List<String> _fields = new()
    {
@@ -33,7 +36,20 @@ public class FieldEnumeratorTests
       var span = _nextOfKinSegment.AsSpan();
 
       // Act.
-      var sut = new FieldEnumerator(span, _fieldSeparator);
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
+
+      // Assert.
+      sut.Current.ToString().Should().BeEmpty();
+   }
+
+   [Fact]
+   public void FieldEnumerator_Constructor_ShouldReturnObject_WhenEscapeCharacterIsDefault()
+   {
+      // Arrange.
+      var span = _nextOfKinSegment.AsSpan();
+
+      // Act.
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
 
       // Assert.
       sut.Current.ToString().Should().BeEmpty();
@@ -47,7 +63,7 @@ public class FieldEnumeratorTests
       var span = str.AsSpan();
 
       // Act.
-      var sut = new FieldEnumerator(span, _fieldSeparator);
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
 
       // Assert.
       sut.Current.ToString().Should().BeEmpty();
@@ -61,7 +77,7 @@ public class FieldEnumeratorTests
       var span = str.AsSpan();
 
       // Act.
-      var sut = new FieldEnumerator(span, _fieldSeparator);
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
 
       // Assert.
       sut.Current.ToString().Should().BeEmpty();
@@ -78,7 +94,7 @@ public class FieldEnumeratorTests
    {
       // Arrange.
       var span = _nextOfKinSegment.AsSpan();
-      var sut = new FieldEnumerator(span, _fieldSeparator);
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
 
       // Act.
       var results = new List<string>();
@@ -98,7 +114,7 @@ public class FieldEnumeratorTests
    {
       // Arrange.
       var span = str.AsSpan();
-      var sut = new FieldEnumerator(span, _fieldSeparator);
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
 
       // Act.
       var results = new List<string>();
@@ -117,7 +133,7 @@ public class FieldEnumeratorTests
       // Arrange
       var str = _fields[3];
       var span = str.AsSpan();
-      var sut = new FieldEnumerator(span, _fieldSeparator);
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
 
       // Act.
       var results = new List<string>();
@@ -132,12 +148,12 @@ public class FieldEnumeratorTests
    }
 
    [Fact]
-   public void LineEnumerator_Enumeration_ShouldReturnExpectedResults_WhenSourceStringHasEmptyFields()
+   public void FieldEnumerator_Enumeration_ShouldReturnExpectedResults_WhenSourceStringHasEmptyFields()
    {
       // Arrange.
       var str = "First^^Last^Generation";
       var span = str.AsSpan();
-      var sut = new FieldEnumerator(span, _subfieldSeparator);
+      var sut = new FieldEnumerator(span, _subfieldSeparator, _escapeCharacter);
 
       var expectedResults = new List<string>()
       {
@@ -159,12 +175,12 @@ public class FieldEnumeratorTests
    }
 
    [Fact]
-   public void LineEnumerator_Enumeration_ShouldReturnExpectedResults_WhenSourceStringHasLeadingEmptyFields()
+   public void FieldEnumerator_Enumeration_ShouldReturnExpectedResults_WhenSourceStringHasLeadingEmptyFields()
    {
       // Arrange.
       var str = "^First^Middle^Last^Generation";
       var span = str.AsSpan();
-      var sut = new FieldEnumerator(span, _subfieldSeparator);
+      var sut = new FieldEnumerator(span, _subfieldSeparator, _escapeCharacter);
 
       var expectedResults = new List<string>()
       {
@@ -187,12 +203,12 @@ public class FieldEnumeratorTests
    }
 
    [Fact]
-   public void LineEnumerator_Enumeration_ShouldReturnExpectedResults_WhenSourceStringHasTrailingEmptyFields()
+   public void FieldEnumerator_Enumeration_ShouldReturnExpectedResults_WhenSourceStringHasTrailingEmptyFields()
    {
       // Arrange.
       var str = "Title^First^Middle^Last^^";
       var span = str.AsSpan();
-      var sut = new FieldEnumerator(span, _subfieldSeparator);
+      var sut = new FieldEnumerator(span, _subfieldSeparator, _escapeCharacter);
 
       // Note only one trailing empty field in results.
       var expectedResults = new List<string>()
@@ -202,6 +218,106 @@ public class FieldEnumeratorTests
          "Middle",
          "Last",
          String.Empty
+      };
+
+      // Act.
+      var results = new List<string>();
+      foreach (var line in sut)
+      {
+         results.Add(line.ToString());
+      }
+
+      // Assert.
+      results.Should().BeEquivalentTo(expectedResults);
+   }
+
+   [Fact]
+   public void FieldEnumerator_Enumeration_ShouldReturnExpectedResults_WhenSourceStringContainsAnEscapedSeparatorCharacter()
+   {
+      // Arrange.
+      var str = @"ABC|de\|fg|HIJ";
+      var span = str.AsSpan();
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
+
+      var expectedResults = new List<string>()
+      {
+         "ABC",
+         @"de\|fg",
+         "HIJ"
+      };
+
+      // Act.
+      var results = new List<string>();
+      foreach (var line in sut)
+      {
+         results.Add(line.ToString());
+      }
+
+      // Assert.
+      results.Should().BeEquivalentTo(expectedResults);
+   }
+
+   [Fact]
+   public void FieldEnumerator_Enumeration_ShouldReturnExpectedResults_WhenSourceStringContainsMultipleEscapedSeparatorCharacters()
+   {
+      // Arrange.
+      var str = @"ABC|d\|e\|f\|g|HIJ";
+      var span = str.AsSpan();
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
+
+      var expectedResults = new List<string>()
+      {
+         "ABC",
+         @"d\|e\|f\|g",
+         "HIJ"
+      };
+
+      // Act.
+      var results = new List<string>();
+      foreach (var line in sut)
+      {
+         results.Add(line.ToString());
+      }
+
+      // Assert.
+      results.Should().BeEquivalentTo(expectedResults);
+   }
+
+   [Fact]
+   public void FieldEnumerator_Enumeration_ShouldReturnExpectedResults_WhenSourceStringContainsOneFieldWithEscapedSeparatorCharacter()
+   {
+      // Arrange.
+      var str = @"ABC\|defgHIJ";
+      var span = str.AsSpan();
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
+
+      var expectedResults = new List<string>()
+      {
+         @"ABC\|defgHIJ"
+      };
+
+      // Act.
+      var results = new List<string>();
+      foreach (var line in sut)
+      {
+         results.Add(line.ToString());
+      }
+
+      // Assert.
+      results.Should().BeEquivalentTo(expectedResults);
+   }
+
+   [Fact]
+   public void FieldEnumerator_Enumeration_ShouldReturnExpectedResults_WhenSourceStringContainsOneFieldWithTrailingEscape()
+   {
+      // Arrange.
+      var str = @"ABC\";
+      var span = str.AsSpan();
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
+
+      var expectedResults = new List<string>()
+      {
+         @"ABC\"
       };
 
       // Act.
@@ -226,7 +342,7 @@ public class FieldEnumeratorTests
    {
       // Arrange. 
       var span = _nextOfKinSegment.AsSpan();
-      var sut = new FieldEnumerator(span, _fieldSeparator);
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
 
       // Act/assert.
       sut.Current.ToString().Should().BeEmpty();
@@ -237,7 +353,7 @@ public class FieldEnumeratorTests
    {
       // Arrange. 
       var span = _nextOfKinSegment.AsSpan();
-      var sut = new FieldEnumerator(span, _fieldSeparator);
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
       sut.MoveNext();
 
       // Act/assert.
@@ -249,7 +365,7 @@ public class FieldEnumeratorTests
    {
       // Arrange. 
       var span = _nextOfKinSegment.AsSpan();
-      var sut = new FieldEnumerator(span, _fieldSeparator);
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
       sut.MoveNext();
       sut.MoveNext();
       sut.MoveNext();
@@ -275,7 +391,7 @@ public class FieldEnumeratorTests
    {
       // Arrange.
       var span = _nextOfKinSegment.AsSpan();
-      var sut = new FieldEnumerator(span, _fieldSeparator);
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
 
       // Act.
       var enumerator = sut.GetEnumerator();
@@ -295,7 +411,7 @@ public class FieldEnumeratorTests
    {
       // Arrange.
       var span = string.Empty.AsSpan();
-      var sut = new FieldEnumerator(span, _fieldSeparator);
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
 
       // Act/assert.
       sut.MoveNext().Should().BeFalse();
@@ -306,7 +422,7 @@ public class FieldEnumeratorTests
    {
       // Arrange.
       var span = "   ".AsSpan();
-      var sut = new FieldEnumerator(span, _fieldSeparator);
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
 
       // Act/assert.
       sut.MoveNext().Should().BeTrue();
@@ -317,7 +433,7 @@ public class FieldEnumeratorTests
    {
       // Arrange.
       var span = _nextOfKinSegment.AsSpan();
-      var sut = new FieldEnumerator(span, _fieldSeparator);
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
 
       // Act/assert.
       sut.MoveNext().Should().BeTrue();
@@ -328,7 +444,7 @@ public class FieldEnumeratorTests
    {
       // Arrange.
       var span = _nextOfKinSegment.AsSpan();
-      var sut = new FieldEnumerator(span, _fieldSeparator);
+      var sut = new FieldEnumerator(span, _fieldSeparator, _escapeCharacter);
       sut.MoveNext();
       sut.MoveNext();
       sut.MoveNext();

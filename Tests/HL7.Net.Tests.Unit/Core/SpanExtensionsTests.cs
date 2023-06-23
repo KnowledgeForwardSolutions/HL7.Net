@@ -11,10 +11,11 @@ public class SpanExtensionsTests
    {
       // Arrange.
       var span = "This is a test|This is only a test|For the next sixty seconds...".AsSpan();
-      var fieldSeparator = '|';
+      var fieldSeparator = DefaultSeparators.FieldSeparator;
+      var escapeCharacter = DefaultSeparators.EscapeCharacter;
 
       // Act.
-      var result = span.ToFields(fieldSeparator);
+      var result = span.ToFields(fieldSeparator, escapeCharacter);
 
       // Assert.
       result.Current.ToString().Should().BeEmpty();
@@ -143,11 +144,64 @@ public class SpanExtensionsTests
       var text = @"This is a test\This is only a test";
       var span = text.AsSpan();
 
+      var expected = @"This is a testThis is only a test";
+
       // Act.
       var decoded = span.GetDecodedString(encodingDetails);
 
       // Assert.
-      decoded.Should().Be(text);
+      decoded.Should().Be(expected);
+   }
+
+   [Fact]
+   public void SpanExtensions_GetDecodedString_ShouldReturnExpectedResult_WhenSpanContainsLeadingEscapeSequence()
+   {
+      // Arrange.
+      var encodingDetails = EncodingDetails.DefaultEncodingDetails;
+      var text = @"\This is a test";
+      var span = text.AsSpan();
+
+      var expected = @"This is a test";
+
+      // Act.
+      var decoded = span.GetDecodedString(encodingDetails);
+
+      // Assert.
+      decoded.Should().Be(expected);
+   }
+
+   [Fact]
+   public void SpanExtensions_GetDecodedString_ShouldReturnExpectedResult_WhenSpanContainsTrailingEscapeCharacter()
+   {
+      // Arrange.
+      var encodingDetails = EncodingDetails.DefaultEncodingDetails;
+      var text = @"This is a test\";
+      var span = text.AsSpan();
+
+      var expected = @"This is a test";
+
+      // Act.
+      var decoded = span.GetDecodedString(encodingDetails);
+
+      // Assert.
+      decoded.Should().Be(expected);
+   }
+
+   [Fact]
+   public void SpanExtensions_GetDecodedString_ShouldReturnExpectedResult_WhenSpanContainsOnlyASingleEscapeCharacter()
+   {
+      // Arrange.
+      var encodingDetails = EncodingDetails.DefaultEncodingDetails;
+      var text = @"\";
+      var span = text.AsSpan();
+
+      var expected = String.Empty;
+
+      // Act.
+      var decoded = span.GetDecodedString(encodingDetails);
+
+      // Assert.
+      decoded.Should().Be(expected);
    }
 
    #endregion

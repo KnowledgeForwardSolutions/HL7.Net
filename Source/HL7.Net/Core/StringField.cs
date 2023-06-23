@@ -44,20 +44,25 @@ public sealed record StringField
       Int32 lineNumber,
       ProcessingLog log)
    {
-      if (!fieldEnumerator.MoveNext() || fieldEnumerator.Current.IsEmpty)
+      if (!fieldEnumerator.MoveNext())
       {
          log.LogFieldNotPresent(lineNumber, fieldSpecification);
          return StringField.NotPresent;
       }
 
       var fieldContents = fieldEnumerator.Current;
-      if (fieldContents.Length == 2 && fieldContents[0] == '"' && fieldContents[1] == '"')
+      var decoded = fieldContents.GetDecodedString(encodingDetails).TrimStart();
+
+      if (String.IsNullOrEmpty(decoded))
+      {
+         log.LogFieldNotPresent(lineNumber, fieldSpecification);
+         return StringField.NotPresent;
+      }
+      if (decoded == GeneralConstants.PresentButNullValue)
       {
          log.LogFieldPresentButNull(lineNumber, fieldSpecification);
          return StringField.PresentButNull;
       }
-
-      var decoded = fieldContents.GetDecodedString(encodingDetails);
       if (decoded.Length > fieldSpecification.Length)
       {
          var message = String.Format(

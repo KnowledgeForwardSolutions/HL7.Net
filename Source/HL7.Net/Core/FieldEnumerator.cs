@@ -6,13 +6,32 @@
 /// </summary>
 public ref struct FieldEnumerator
 {
+   private readonly Char _escapeCharacter;
    private readonly Char _separator;
    private ReadOnlySpan<Char> _text;
 
-   public FieldEnumerator(ReadOnlySpan<Char> text, Char separator)
+   /// <summary>
+   ///   Initialize a new <see cref="FieldEnumerator"/> object.
+   /// </summary>
+   /// <param name="text">
+   ///   The span of characters to process.
+   /// </param>
+   /// <param name="separator">
+   ///   The character used to indicate the end of a field and the start of 
+   ///   another.
+   /// </param>
+   /// <param name="escapeCharacter">
+   ///   The character used to "escape" the separator character and allow it to
+   ///   be included in a field instead of starting a new field.
+   /// </param>
+   internal FieldEnumerator(
+      ReadOnlySpan<Char> text, 
+      Char separator,
+      Char escapeCharacter)
    {
       _text = text;
       _separator = separator;
+      _escapeCharacter = escapeCharacter;
       Current = default;
    }
 
@@ -48,6 +67,12 @@ public ref struct FieldEnumerator
       }
 
       var index = span.IndexOf(_separator);
+
+      // Skip over escaped separator characters.
+      while (index > 0 && span[index - 1] == _escapeCharacter)
+      {
+         index = span.IndexOf(_separator, index + 1);
+      }
 
       // Handle only one line remaining.
       if (index == -1)

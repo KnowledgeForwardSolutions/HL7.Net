@@ -143,7 +143,9 @@ public class MessageHeaderSegment : ISegment
 
       // Enumerate the fields and skip over the first field which contains the
       // segment ID.
-      var fieldEnumerator = segmentText.ToFields(segment.FieldSeparator);
+      var fieldEnumerator = segmentText.ToFields(
+         segment.FieldSeparator,
+         '\0');
       fieldEnumerator.MoveNext();
 
       segment.EncodingCharacters = EncodingCharactersField.Parse(
