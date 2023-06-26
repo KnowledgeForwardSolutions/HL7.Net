@@ -70,6 +70,15 @@ namespace HL7.Net {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Field {0} contains data that could not be parsed as an integer value.
+        /// </summary>
+        internal static string InvalidIntegerNumericValue {
+            get {
+                return ResourceManager.GetString("InvalidIntegerNumericValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value must be an integer greater than zero (0) or minus one (-1) to indicate that the field allows unlimited length.
         /// </summary>
         internal static string InvalidMaxLength {
@@ -84,6 +93,15 @@ namespace HL7.Net {
         internal static string InvalidNumberOfRepetitionsAllowed {
             get {
                 return ResourceManager.GetString("InvalidNumberOfRepetitionsAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Field {0} contains data that could not be parsed as an numeric value.
+        /// </summary>
+        internal static string InvalidNumericValue {
+            get {
+                return ResourceManager.GetString("InvalidNumericValue", resourceCulture);
             }
         }
         

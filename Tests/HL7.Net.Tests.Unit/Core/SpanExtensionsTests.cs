@@ -205,4 +205,46 @@ public class SpanExtensionsTests
    }
 
    #endregion
+
+   #region IsPresentButNull Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void SpanExtensions_IsPresentButNull_ShouldReturnTrue_WhenSpanOnlyContainsTwoDoubleQuoteCharacters()
+   {
+      // Arrange.
+      var span = GeneralConstants.PresentButNullValue.AsSpan();
+
+      // Act/assert.
+      span.IsPresentButNull().Should().BeTrue();
+   }
+
+   [Theory]
+   [InlineData(null)]
+   [InlineData("")]
+   public void SpanExtensions_IsPresentButNull_ShouldReturnFalse_WhenSpanIsEmpty(String fieldContents)
+   {
+      // Arrange.
+      var span = fieldContents.AsSpan();
+
+      // Act/assert.
+      span.IsPresentButNull().Should().BeFalse();
+   }
+
+   [Theory]
+   [InlineData("asdf")]
+   [InlineData("a")]
+   [InlineData("\"")]
+   [InlineData("\"\"asdf")]
+   public void SpanExtensions_IsPresentButNull_ShouldReturnFalse_WhenSpanNonEmptyIsNoPresentButNullIndicator(String fieldContents)
+   {
+      // Arrange.
+      var span = fieldContents.AsSpan();
+
+      // Act/assert.
+      span.IsPresentButNull().Should().BeFalse();
+   }
+
+   #endregion
 }

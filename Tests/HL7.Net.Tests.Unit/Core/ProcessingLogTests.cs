@@ -450,6 +450,63 @@ public class ProcessingLogTests
 
    #endregion
 
+   #region LogFieldPresentButPossiblyTruncated Method Tests
+   // ==========================================================================
+   // ==========================================================================
+
+   [Fact]
+   public void ProcessingLog_LogFieldPresentButPossiblyTruncated_ShouldAddExpectedEntry_WhenFieldWasNotTruncated()
+   {
+      // Arrange.
+      var sut = new ProcessingLog();
+      var fieldContents = "1234";
+      var fieldSpecification = _fieldSpecification with { Length = 5, Datatype = HL7Datatype.NM_Numeric };
+
+      var message = String.Format(Messages.LogFieldPresent, fieldSpecification.FieldDescription);
+
+      var expectedEntry = new LogEntry(
+         LogLevel.Information,
+         message,
+         _lineNumber,
+         fieldSpecification.FieldDescription,
+         fieldContents);
+
+      // Act.
+      sut.LogFieldPresentButPossiblyTruncated(_lineNumber, fieldSpecification, fieldContents.AsSpan());
+
+      // Assert.
+      sut.First().Should().Be(expectedEntry);
+   }
+
+   [Fact]
+   public void ProcessingLog_LogFieldPresentButPossiblyTruncated_ShouldAddExpectedEntry_WhenFieldWasTruncated()
+   {
+      // Arrange.
+      var sut = new ProcessingLog();
+      var fieldContents = "12345678";
+      var fieldSpecification = _fieldSpecification with { Length = 5, Datatype = HL7Datatype.NM_Numeric };
+
+      var message = String.Format(
+         Messages.LogFieldPresentButTruncated, 
+         fieldSpecification.FieldDescription,
+         fieldSpecification.Length);
+
+      var expectedEntry = new LogEntry(
+         LogLevel.Warning,
+         message,
+         _lineNumber,
+         fieldSpecification.FieldDescription,
+         fieldContents);
+
+      // Act.
+      sut.LogFieldPresentButPossiblyTruncated(_lineNumber, fieldSpecification, fieldContents.AsSpan());
+
+      // Assert.
+      sut.First().Should().Be(expectedEntry);
+   }
+
+   #endregion
+
    #region LogInformation Method Tests
    // ==========================================================================
    // ==========================================================================

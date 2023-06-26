@@ -48,7 +48,7 @@ public class PatientIdentificationSegment : ISegment
    ///   For those messages that permit segments to repeat, the Set ID field is 
    ///   used to identify the repetitions.
    /// </summary>
-   public StringField SetID { get; private set; } = default!;
+   public SequenceIDField SetID { get; private set; } = default!;
 
    /// <summary>
    ///   If the patient is from another institution, outside office, etc., the 
@@ -174,7 +174,7 @@ public class PatientIdentificationSegment : ISegment
    ///   If a patient was part of a multiple birth, a value (number) indicating 
    ///   the patient's birth order.
    /// </summary>
-   public StringField BirthOrder { get; private set; } = default!;
+   public NumericField BirthOrder { get; private set; } = default!;
 
    /// <summary>
    ///   Indicates the patient's country of citizenship.
@@ -201,9 +201,8 @@ public class PatientIdentificationSegment : ISegment
          encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
 
-      segment.SetID = StringField.Parse(
+      segment.SetID = SequenceIDField.Parse(
          ref fieldEnumerator,
-         encodingDetails,
          _fieldSpecifications[0],
          lineNumber,
          log);
@@ -369,9 +368,8 @@ public class PatientIdentificationSegment : ISegment
          lineNumber,
          log);
 
-      segment.BirthOrder = StringField.Parse(
+      segment.BirthOrder = NumericField.Parse(
          ref fieldEnumerator,
-         encodingDetails,
          _fieldSpecifications[24],
          lineNumber,
          log);
