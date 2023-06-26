@@ -1,6 +1,4 @@
-﻿using HL7.Net.V2Point2;
-
-namespace HL7.Net.Tests.Unit.V2Point2;
+﻿namespace HL7.Net.Tests.Unit.V2Point2;
 
 public class HL7MessageTests
 {

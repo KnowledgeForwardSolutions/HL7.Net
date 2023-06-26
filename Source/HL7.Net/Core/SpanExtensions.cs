@@ -92,4 +92,18 @@ public static class SpanExtensions
 
       return startIndex + indexInSlice;
    }
+
+   /// <summary>
+   ///   Check if the span contains the HL7 representation of a value that is 
+   ///   present, but null.
+   /// </summary>
+   /// <param name="span">
+   ///   The span to check.
+   /// </param>
+   /// <returns>
+   ///   <see langword="true"/> if the span contains the HL7 representation of a 
+   ///   value that is present, but null; otherwise <see langword="false"/>.
+   /// </returns>
+   public static Boolean IsPresentButNull(this ReadOnlySpan<char> span)
+      => span.Length == 2 && span[0] == '"' && span[1] == '"';
 }

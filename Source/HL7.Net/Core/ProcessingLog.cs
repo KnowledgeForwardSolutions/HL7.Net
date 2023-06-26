@@ -82,6 +82,29 @@ public class ProcessingLog : IEnumerable<LogEntry>
       LogInformation(message, lineNumber, fieldSpecification, "\"\"");
    }
 
+   internal void LogFieldPresentButPossiblyTruncated(
+      Int32 lineNumber,
+      FieldSpecification fieldSpecification,
+      ReadOnlySpan<Char> fieldContents)
+   {
+      String message;
+      if (fieldContents.Length > fieldSpecification.Length)
+      {
+         message = String.Format(
+            Messages.LogFieldPresentButTruncated,
+            fieldSpecification.FieldDescription,
+            fieldSpecification.Length);
+         LogWarning(message, lineNumber, fieldSpecification, fieldContents.ToString());
+      }
+      else
+      {
+         message = String.Format(
+            Messages.LogFieldPresent,
+            fieldSpecification.FieldDescription);
+         LogInformation(message, lineNumber, fieldSpecification, fieldContents.ToString());
+      }
+   }
+
    internal void LogInformation(
       String message,
       Int32 lineNumber,

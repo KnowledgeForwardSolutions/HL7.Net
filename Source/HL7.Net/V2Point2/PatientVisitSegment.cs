@@ -74,7 +74,7 @@ public class PatientVisitSegment : ISegment
    ///   permit segments to repeat, the Set ID field is used to identify the
    ///   repetitions.
    /// </summary>
-   public StringField SetID { get; private set; } = default!;
+   public SequenceIDField SetID { get; private set; } = default!;
 
    /// <summary>
    ///   A common field used by systems to categorize patients by site.
@@ -209,12 +209,12 @@ public class PatientVisitSegment : ISegment
    /// <summary>
    ///   Amount to be paid by the guarantor each period as per the contract.
    /// </summary>
-   public StringField ContractAmount { get; private set; } = default!;
+   public NumericField ContractAmount { get; private set; } = default!;
 
    /// <summary>
    ///   Specifies the duration of the contract for user-defined periods.
    /// </summary>
-   public StringField ContractPeriod { get; private set; } = default!;
+   public NumericField ContractPeriod { get; private set; } = default!;
 
    /// <summary>
    ///   Indicates the amount of interest that will be charged the guarantor on 
@@ -241,12 +241,12 @@ public class PatientVisitSegment : ISegment
    /// <summary>
    ///   Amount that was transferred to a bad debt status.
    /// </summary>
-   public StringField BadDebtTransferAmount { get; private set; } = default!;
+   public NumericField BadDebtTransferAmount { get; private set; } = default!;
 
    /// <summary>
    ///   Amount recovered from the guarantor on the account.
    /// </summary>
-   public StringField BadDebtRecoveryAmount { get; private set; } = default!;
+   public NumericField BadDebtRecoveryAmount { get; private set; } = default!;
 
    /// <summary>
    ///   Indicates that the account was deleted from the file and the reason.
@@ -317,22 +317,22 @@ public class PatientVisitSegment : ISegment
    /// <summary>
    ///   Visit balance due. 
    /// </summary>
-   public StringField CurrentPatientBalance { get; private set; } = default!;
+   public NumericField CurrentPatientBalance { get; private set; } = default!;
 
    /// <summary>
    ///   Total visit charges.
    /// </summary>
-   public StringField TotalCharges { get; private set; } = default!;
+   public NumericField TotalCharges { get; private set; } = default!;
 
    /// <summary>
    ///   Total adjustments for visit.
    /// </summary>
-   public StringField TotalAdjustments { get; private set; } = default!;
+   public NumericField TotalAdjustments { get; private set; } = default!;
 
    /// <summary>
    ///   Total payments for visit.
    /// </summary>
-   public StringField TotalPayments { get; private set; } = default!;
+   public NumericField TotalPayments { get; private set; } = default!;
 
    /// <summary>
    ///   Optional visit ID number to be used if needed
@@ -354,9 +354,8 @@ public class PatientVisitSegment : ISegment
          encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
 
-      segment.SetID = StringField.Parse(
+      segment.SetID = SequenceIDField.Parse(
          ref fieldEnumerator,
-         encodingDetails,
          _fieldSpecifications[0],
          lineNumber,
          log);
@@ -529,16 +528,14 @@ public class PatientVisitSegment : ISegment
          lineNumber,
          log);
 
-      segment.ContractAmount = StringField.Parse(
+      segment.ContractAmount = NumericField.Parse(
          ref fieldEnumerator,
-         encodingDetails,
          _fieldSpecifications[25],
          lineNumber,
          log);
 
-      segment.ContractPeriod = StringField.Parse(
+      segment.ContractPeriod = NumericField.Parse(
          ref fieldEnumerator,
-         encodingDetails,
          _fieldSpecifications[26],
          lineNumber,
          log);
@@ -571,16 +568,14 @@ public class PatientVisitSegment : ISegment
          lineNumber,
          log);
 
-      segment.BadDebtTransferAmount = StringField.Parse(
+      segment.BadDebtTransferAmount = NumericField.Parse(
          ref fieldEnumerator,
-         encodingDetails,
          _fieldSpecifications[31],
          lineNumber,
          log);
 
-      segment.BadDebtRecoveryAmount = StringField.Parse(
+      segment.BadDebtRecoveryAmount = NumericField.Parse(
          ref fieldEnumerator,
-         encodingDetails,
          _fieldSpecifications[32],
          lineNumber,
          log);
@@ -669,30 +664,26 @@ public class PatientVisitSegment : ISegment
          lineNumber,
          log);
 
-      segment.CurrentPatientBalance = StringField.Parse(
+      segment.CurrentPatientBalance = NumericField.Parse(
          ref fieldEnumerator,
-         encodingDetails,
          _fieldSpecifications[45],
          lineNumber,
          log);
 
-      segment.TotalCharges = StringField.Parse(
+      segment.TotalCharges = NumericField.Parse(
          ref fieldEnumerator,
-         encodingDetails,
          _fieldSpecifications[46],
          lineNumber,
          log);
 
-      segment.TotalAdjustments = StringField.Parse(
+      segment.TotalAdjustments = NumericField.Parse(
          ref fieldEnumerator,
-         encodingDetails,
          _fieldSpecifications[47],
          lineNumber,
          log);
 
-      segment.TotalPayments = StringField.Parse(
+      segment.TotalPayments = NumericField.Parse(
          ref fieldEnumerator,
-         encodingDetails,
          _fieldSpecifications[48],
          lineNumber,
          log);

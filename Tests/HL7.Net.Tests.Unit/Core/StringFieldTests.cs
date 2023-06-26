@@ -34,6 +34,20 @@ public class StringFieldTests
       sut.FieldPresence.Should().Be(FieldPresence.Present);
    }
 
+   [Fact]
+   public void StringField_Constructor_ShouldCreateObject_WhenStringValueAndFieldPresenceAreSupplied()
+   {
+      var value = "asdf";
+
+      // Act.
+      var sut = new StringField(value, FieldPresence.NotPresent);
+
+      // Assert.
+      sut.Should().NotBeNull();
+      sut.Value.Should().Be(value);
+      sut.FieldPresence.Should().Be(FieldPresence.NotPresent);
+   }
+
    #endregion
 
    #region Implicit String Converter Tests
@@ -468,7 +482,7 @@ public class StringFieldTests
    }
 
    [Fact]
-   public void StringField_Parse_ShouldLogPresentButNull_WhenFieldIsTwoDoubleQuotes()
+   public void StringField_Parse_ShouldLogFieldPresentButNull_WhenFieldIsTwoDoubleQuotes()
    {
       // Arrange.
       var line = "TST|\"\"|This is a test..".AsSpan();
@@ -479,13 +493,12 @@ public class StringFieldTests
       var message = String.Format(
          Messages.LogFieldPresentButNull,
          _fieldSpecification.FieldDescription);
-      var rawData = "\"\"";
       var expectedLogEntry = new LogEntry(
          LogLevel.Information,
          message,
          _lineNumber,
          _fieldSpecification.FieldDescription,
-         rawData);
+         GeneralConstants.PresentButNullValue);
 
       // Act.
       _ = StringField.Parse(
