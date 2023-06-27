@@ -1,16 +1,17 @@
 ﻿namespace HL7.Net.Tests.Unit.Core;
 
-public class SequenceIdFieldTests
+public class DateTimeComponentTests
 {
    private static readonly EncodingDetails _encodingDetails = EncodingDetails.DefaultEncodingDetails;
    private static readonly FieldSpecification _fieldSpecification = new(
-      "TST",
+      "TS",
       1,
-      "Test Field",
-      4,
-      HL7Datatype.SI_SequenceID,
-      Optionality.Optional,
+      "DateTime",
+      26,
+      HL7Datatype.DateTimeComponent,
+      Optionality.Required,
       "N");
+   private static readonly TimeSpan _defaultTimezoneOffset = new TimeSpan(-1, 0, 0);
    private const Int32 _lineNumber = 10;
 
    #region Internal Constructor Tests
@@ -18,12 +19,12 @@ public class SequenceIdFieldTests
    // ==========================================================================
 
    [Fact]
-   public void SequenceIDField_Constructor_ShouldCreateObject_WhenValueIsSupplied()
+   public void DateTimeComponent_Constructor_ShouldCreateObject_WhenValueIsSupplied()
    {
-      var value = 42;
+      var value = new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 21, 223, 4), new TimeSpan(6, 0, 0));
 
       // Act.
-      var sut = new SequenceIDField(value);
+      var sut = new DateTimeComponent(value);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -32,12 +33,12 @@ public class SequenceIdFieldTests
    }
 
    [Fact]
-   public void SequenceIDField_Constructor_ShouldCreateObject_WhenValueAndFieldPresenceAreSupplied()
+   public void DateTimeComponent_Constructor_ShouldCreateObject_WhenValueAndFieldPresenceAreSupplied()
    {
-      Int32? value = null!;
+      DateTimeOffset? value = null!;
 
       // Act.
-      var sut = new SequenceIDField(value, FieldPresence.NotPresent);
+      var sut = new DateTimeComponent(value, FieldPresence.NotPresent);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -47,32 +48,32 @@ public class SequenceIdFieldTests
 
    #endregion
 
-   #region Implicit Integer Converter Tests
+   #region Implicit DateTime Converter Tests
    // ==========================================================================
    // ==========================================================================
 
    [Fact]
-   public void SequenceIDField_ImplicitIntegerConverter_ShouldReturnExpectedValue_WhenFieldIsNotEmpty()
+   public void DateTimeComponent_ImplicitDecimalConverter_ShouldReturnExpectedValue_WhenFieldIsNotEmpty()
    {
       // Arrange.
-      var value = 42;
-      var sut = new SequenceIDField(value);
+      var value = new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 21, 223, 4), new TimeSpan(6, 0, 0));
+      var sut = new DateTimeComponent(value);
 
       // Act.
-      Decimal? result = sut;
+      DateTimeOffset? result = sut;
 
       // Assert.
       result.Should().Be(value);
    }
 
    [Fact]
-   public void SequenceIDField_ImplicitIntegerConverter_ShouldReturnExpectedValue_WhenFieldIsNotPresent()
+   public void DateTimeComponent_ImplicitDecimalConverter_ShouldReturnExpectedValue_WhenFieldIsNotPresent()
    {
       // Arrange.
-      var sut = SequenceIDField.NotPresent;
+      var sut = DateTimeComponent.NotPresent;
 
       // Act.
-      Decimal? result = sut;
+      DateTimeOffset? result = sut;
 
       // Assert.
       result.Should().BeNull();
@@ -85,10 +86,10 @@ public class SequenceIdFieldTests
    // ==========================================================================
 
    [Fact]
-   public void SequenceIDField_NotPresent_ShouldReturnExpectedValue()
+   public void DateTimeComponent_NotPresent_ShouldReturnExpectedValue()
    {
       // Act.
-      var sut = SequenceIDField.NotPresent;
+      var sut = DateTimeComponent.NotPresent;
 
       // Assert.
       sut.Should().NotBeNull();
@@ -103,10 +104,10 @@ public class SequenceIdFieldTests
    // ==========================================================================
 
    [Fact]
-   public void SequenceIDField_PresentButNull_ShouldReturnExpectedValue()
+   public void DateTimeComponent_PresentButNull_ShouldReturnExpectedValue()
    {
       // Act.
-      var sut = SequenceIDField.PresentButNull;
+      var sut = DateTimeComponent.PresentButNull;
 
       // Assert.
       sut.Should().NotBeNull();
@@ -120,12 +121,25 @@ public class SequenceIdFieldTests
    // ==========================================================================
    // ==========================================================================
 
+   public static TheoryData<String, DateTimeOffset> ValidDateTimeData => new()
+   {
+      { "20230608", new DateTimeOffset(new DateTime(2023, 6, 8), _defaultTimezoneOffset) },
+      { "20230608+0800", new DateTimeOffset(new DateTime(2023, 6, 8), new TimeSpan(8, 0, 0)) },
+      { "202306081920", new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 0), _defaultTimezoneOffset) },
+      { "202306080000", new DateTimeOffset(new DateTime(2023, 6, 8, 0, 0, 0), _defaultTimezoneOffset) },
+      { "202306081920-0330", new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 0), new TimeSpan(-3, -30, 0)) },
+      { "20230608192021", new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 21), _defaultTimezoneOffset) },
+      { "20230608192021+1100", new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 21), new TimeSpan(11, 0, 0)) },
+      { "20230608192021.2234", new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 21, 223, 400), _defaultTimezoneOffset) },
+      { "20230608192021.2234+0600", new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 21, 223, 400), new TimeSpan(6, 0, 0)) },
+      { "20230608192021.2234-0700", new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 21, 223, 400), new TimeSpan(-7, 0, 0)) },
+   };
+
    [Theory]
-   [InlineData("42", 42)]
-   [InlineData("1234 ", 1234)]
-   public void SequenceIDField_Parse_ShouldReturnIntegerValue_WhenFieldContainsValidIntegerValue(
+   [MemberData(nameof(ValidDateTimeData))]
+   public void DateTimeComponent_Parse_ShouldReturnDateTimeValue_WhenFieldContainsValidNumericValue(
       String fieldContents,
-      Int32 expectedValue)
+      DateTimeOffset expectedValue)
    {
       // Arrange.
       var line = $"TST|{fieldContents}|This is a test...|This is only a test...".AsSpan();
@@ -133,12 +147,13 @@ public class SequenceIdFieldTests
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      var expected = new SequenceIDField(expectedValue);
+      var expected = new DateTimeComponent(expectedValue);
 
       // Act.
-      var field = SequenceIDField.Parse(
+      var field = DateTimeComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
+         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -147,10 +162,10 @@ public class SequenceIdFieldTests
    }
 
    [Fact]
-   public void SequenceIDField_Parse_ShouldLogExpectedEntry_WhenFieldContainsValidIntegerValue()
+   public void DateTimeComponent_Parse_ShouldLogExpectedEntry_WhenFieldContainsValidNumericValue()
    {
       // Arrange.
-      var fieldContents = "42";
+      var fieldContents = "20230608192021.2234+0600";
       var line = $"TST|{fieldContents}|This is a test...|This is only a test...".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
@@ -166,9 +181,10 @@ public class SequenceIdFieldTests
          fieldContents);
 
       // Act.
-      _ = SequenceIDField.Parse(
+      _ = DateTimeComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
+         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -178,22 +194,21 @@ public class SequenceIdFieldTests
    }
 
    [Theory]
-   [InlineData("$42")]
-   [InlineData("42GBP")]
-   [InlineData("42-")]
-   [InlineData("(42)")]
-   [InlineData(" 42")]
-   [InlineData("42 ")]
-   [InlineData(" 42 ")]
-   [InlineData("   ")]
-   [InlineData("42,000")]
-   [InlineData("42E-3")]
-   [InlineData("+42")]
-   [InlineData("-42")]
-   [InlineData("42.42")]
-   [InlineData("123.4567")]
-   [InlineData("-123.456")]
-   public void SequenceIDField_Parse_ShouldReturnNotPresentInstance_WhenFieldContainsAnInvalidIntegerValue(String fieldContents)
+   [InlineData("20232201")]            // Invalid month
+   [InlineData("20231033")]            // Invalid day
+   [InlineData("2023010133")]          // Invalid hour
+   [InlineData("202301011077")]        // Invalid second
+   [InlineData("2023112")]             // Shorter than accepted format
+   [InlineData("202311221")]
+   [InlineData("20231122112")]
+   [InlineData("2023112211223")]
+   [InlineData("20231122112233.111")]
+   [InlineData("20231122112233.1111+601")]
+   [InlineData("asdf")]
+   [InlineData(" 20230101")]           // Leading/trailing whitespace
+   [InlineData("20230101 ")]
+   [InlineData(" 20230101 ")]
+   public void DateTimeComponent_Parse_ShouldReturnNotPresentInstance_WhenFieldContainsAnInvalidTimestampValue(String fieldContents)
    {
       // Arrange.
       var line = $"TST|{fieldContents}|This is a test...|This is only a test...".AsSpan();
@@ -202,33 +217,33 @@ public class SequenceIdFieldTests
       var log = new ProcessingLog();
 
       // Act.
-      var field = SequenceIDField.Parse(
+      var field = DateTimeComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
+         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(SequenceIDField.NotPresent);
+      field.Should().Be(DateTimeComponent.NotPresent);
    }
 
    [Theory]
-   [InlineData("$42")]
-   [InlineData("42GBP")]
-   [InlineData("42-")]
-   [InlineData("(42)")]
-   [InlineData(" 42")]
-   [InlineData("42 ")]
-   [InlineData(" 42 ")]
-   [InlineData("   ")]
-   [InlineData("42,000")]
-   [InlineData("42E-3")]
-   [InlineData("+42")]
-   [InlineData("-42")]
-   [InlineData("42.42")]
-   [InlineData("123.4567")]
-   [InlineData("-123.456")]
-   public void SequenceIDField_Parse_ShouldLogError_WhenFieldContainsAnInvalidIntegerValue(String fieldContents)
+   [InlineData("20232201")]            // Invalid month
+   [InlineData("20231033")]            // Invalid day
+   [InlineData("2023010133")]          // Invalid hour
+   [InlineData("202301011077")]        // Invalid second
+   [InlineData("2023112")]             // Shorter than accepted format
+   [InlineData("202311221")]
+   [InlineData("20231122112")]
+   [InlineData("2023112211223")]
+   [InlineData("20231122112233.111")]
+   [InlineData("20231122112233.1111+601")]
+   [InlineData("asdf")]
+   [InlineData(" 20230101")]           // Leading/trailing whitespace
+   [InlineData("20230101 ")]
+   [InlineData(" 20230101 ")]
+   public void DateTimeComponent_Parse_ShouldLogError_WhenFieldContainsAnInvalidNumericValue(String fieldContents)
    {
       // Arrange.
       var line = $"TST|{fieldContents}|This is a test...|This is only a test...".AsSpan();
@@ -237,7 +252,7 @@ public class SequenceIdFieldTests
       var log = new ProcessingLog();
 
       var message = String.Format(
-         Messages.InvalidNumericValue,
+         Messages.InvalidTimestampValue,
          _fieldSpecification.FieldDescription);
       var expectedLogEntry = new LogEntry(
          LogLevel.Error,
@@ -247,66 +262,10 @@ public class SequenceIdFieldTests
          fieldContents);
 
       // Act.
-      _ = SequenceIDField.Parse(
+      _ = DateTimeComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
-         _lineNumber,
-         log);
-
-      // Assert.
-      log.Should().HaveCount(1);
-      log.First().Should().Be(expectedLogEntry);
-   }
-
-   [Fact]
-   public void SequenceIDField_Parse_ShouldTruncateValue_WhenFieldIsLongerThanMaxLength()
-   {
-      // Arrange.
-      var fieldContents = "123456";
-      var line = $"TST|{fieldContents}|This is a test...|This is only a test...".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
-      fieldEnumerator.MoveNext();
-      var log = new ProcessingLog();
-
-      var expectedValue = 1234;
-      var expected = new SequenceIDField(expectedValue);
-
-      // Act.
-      var field = SequenceIDField.Parse(
-         ref fieldEnumerator,
-         _fieldSpecification,
-         _lineNumber,
-         log);
-
-      // Assert.
-      field.Should().Be(expected);
-   }
-
-   [Fact]
-   public void SequenceIDField_Parse_ShouldLogExpectedEntry_WhenFieldIsLongerThanMaxLength()
-   {
-      // Arrange.
-      var fieldContents = "123456";
-      var line = $"TST|{fieldContents}|This is a test...|This is only a test...".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
-      fieldEnumerator.MoveNext();
-      var log = new ProcessingLog();
-
-      var message = String.Format(
-         Messages.LogFieldPresentButTruncated,
-         _fieldSpecification.FieldDescription,
-         _fieldSpecification.Length);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Warning,
-         message,
-         _lineNumber,
-         _fieldSpecification.FieldDescription,
-         fieldContents);
-
-      // Act.
-      _ = SequenceIDField.Parse(
-         ref fieldEnumerator,
-         _fieldSpecification,
+         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -318,7 +277,7 @@ public class SequenceIdFieldTests
    [Theory]
    [InlineData(Optionality.Optional)]
    [InlineData(Optionality.Required)]
-   public void SequenceIDField_Parse_ShouldReturnNotPresentInstance_WhenFieldIsBeyondEndOfSuppliedFields(Optionality optionality)
+   public void DateTimeComponent_Parse_ShouldReturnNotPresentInstance_WhenFieldIsBeyondEndOfSuppliedFields(Optionality optionality)
    {
       // Arrange.
       var line = "TST|This is a test..".AsSpan();
@@ -329,18 +288,19 @@ public class SequenceIdFieldTests
       var fieldSpecification = _fieldSpecification with { Optionality = optionality, Sequence = 2 };
 
       // Act.
-      var field = SequenceIDField.Parse(
+      var field = DateTimeComponent.Parse(
          ref fieldEnumerator,
          fieldSpecification,
+         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(SequenceIDField.NotPresent);
+      field.Should().Be(DateTimeComponent.NotPresent);
    }
 
    [Fact]
-   public void SequenceIDField_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsBeyondEndOfSuppliedFields()
+   public void DateTimeComponent_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsBeyondEndOfSuppliedFields()
    {
       // Arrange.
       var line = "TST|This is a test..".AsSpan();
@@ -360,9 +320,10 @@ public class SequenceIdFieldTests
          fieldSpecification.FieldDescription);
 
       // Act.
-      _ = SequenceIDField.Parse(
+      _ = DateTimeComponent.Parse(
          ref fieldEnumerator,
-         _fieldSpecification,
+         fieldSpecification,
+         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -372,7 +333,7 @@ public class SequenceIdFieldTests
    }
 
    [Fact]
-   public void SequenceIDField_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsBeyondEndOfSuppliedFields()
+   public void DateTimeComponent_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsBeyondEndOfSuppliedFields()
    {
       // Arrange.
       var line = "TST|This is a test..".AsSpan();
@@ -392,9 +353,10 @@ public class SequenceIdFieldTests
          fieldSpecification.FieldDescription);
 
       // Act.
-      _ = SequenceIDField.Parse(
+      _ = DateTimeComponent.Parse(
          ref fieldEnumerator,
          fieldSpecification,
+         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -406,7 +368,7 @@ public class SequenceIdFieldTests
    [Theory]
    [InlineData(Optionality.Optional)]
    [InlineData(Optionality.Required)]
-   public void SequenceIDField_Parse_ShouldReturnNotPresentInstance_WhenFieldIsEmpty(Optionality optionality)
+   public void DateTimeComponent_Parse_ShouldReturnNotPresentInstance_WhenFieldIsEmpty(Optionality optionality)
    {
       // Arrange.
       var line = "TST||This is a test..".AsSpan();
@@ -416,38 +378,41 @@ public class SequenceIdFieldTests
       var fieldSpecification = _fieldSpecification with { Optionality = optionality };
 
       // Act.
-      var field = SequenceIDField.Parse(
+      var field = DateTimeComponent.Parse(
          ref fieldEnumerator,
          fieldSpecification,
+         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(SequenceIDField.NotPresent);
+      field.Should().Be(DateTimeComponent.NotPresent);
    }
 
    [Fact]
-   public void SequenceIDField_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsEmpty()
+   public void DateTimeComponent_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsEmpty()
    {
       // Arrange.
       var line = "TST||This is a test..".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
+      var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Optional };
 
       var message = String.Format(
          Messages.LogFieldNotPresent,
-         _fieldSpecification.FieldDescription);
+         fieldSpecification.FieldDescription);
       var expectedLogEntry = new LogEntry(
          LogLevel.Information,
          message,
          _lineNumber,
-         _fieldSpecification.FieldDescription);
+         fieldSpecification.FieldDescription);
 
       // Act.
-      _ = SequenceIDField.Parse(
+      _ = DateTimeComponent.Parse(
          ref fieldEnumerator,
-         _fieldSpecification,
+         fieldSpecification,
+         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -457,7 +422,7 @@ public class SequenceIdFieldTests
    }
 
    [Fact]
-   public void SequenceIDField_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsEmpty()
+   public void DateTimeComponent_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsEmpty()
    {
       // Arrange.
       var line = "TST||This is a test..".AsSpan();
@@ -476,9 +441,10 @@ public class SequenceIdFieldTests
          fieldSpecification.FieldDescription);
 
       // Act.
-      _ = SequenceIDField.Parse(
+      _ = DateTimeComponent.Parse(
          ref fieldEnumerator,
          fieldSpecification,
+         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -488,7 +454,7 @@ public class SequenceIdFieldTests
    }
 
    [Fact]
-   public void SequenceIDField_Parse_ShouldReturnPresentButNullInstance_WhenFieldIsTwoDoubleQuotes()
+   public void DateTimeComponent_Parse_ShouldReturnPresentButNullInstance_WhenFieldIsTwoDoubleQuotes()
    {
       // Arrange.
       var line = "TST|\"\"|This is a test..".AsSpan();
@@ -497,18 +463,19 @@ public class SequenceIdFieldTests
       var log = new ProcessingLog();
 
       // Act.
-      var field = SequenceIDField.Parse(
+      var field = DateTimeComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
+         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(SequenceIDField.PresentButNull);
+      field.Should().Be(DateTimeComponent.PresentButNull);
    }
 
    [Fact]
-   public void SequenceIDField_Parse_ShouldLogFieldPresentButNull_WhenFieldIsTwoDoubleQuotes()
+   public void DateTimeComponent_Parse_ShouldLogFieldPresentButNull_WhenFieldIsTwoDoubleQuotes()
    {
       // Arrange.
       var line = "TST|\"\"|This is a test..".AsSpan();
@@ -527,9 +494,10 @@ public class SequenceIdFieldTests
          GeneralConstants.PresentButNullValue);
 
       // Act.
-      _ = SequenceIDField.Parse(
+      _ = DateTimeComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
+         _defaultTimezoneOffset,
          _lineNumber,
          log);
 

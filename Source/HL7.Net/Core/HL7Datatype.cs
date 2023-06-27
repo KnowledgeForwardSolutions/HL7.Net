@@ -26,4 +26,7 @@ public enum HL7Datatype
    RP_ReferencePointer,
    TQ_TimingQuantity,
    MO_Money,
+   //
+   DateTimeComponent,
+   TimestampDegreeOfPrecisionComponent,
 }

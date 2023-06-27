@@ -37,7 +37,7 @@ public class StringFieldTests
    [Fact]
    public void StringField_Constructor_ShouldCreateObject_WhenStringValueAndFieldPresenceAreSupplied()
    {
-      var value = "asdf";
+      String? value = null!;
 
       // Act.
       var sut = new StringField(value, FieldPresence.NotPresent);
@@ -62,7 +62,7 @@ public class StringFieldTests
       var sut = new StringField(text);
 
       // Act.
-      String str = sut;
+      String? str = sut;
 
       // Assert.
       str.Should().Be(text);
@@ -75,7 +75,7 @@ public class StringFieldTests
       var sut = StringField.NotPresent;
 
       // Act.
-      String str = sut;
+      String? str = sut;
 
       // Assert.
       str.Should().BeNull();
