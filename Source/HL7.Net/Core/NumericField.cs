@@ -6,7 +6,7 @@
 public sealed record NumericField
 {
    /// <summary>
-   ///   Represents an numeric field that is not present.
+   ///   Represents a numeric field that is not present.
    /// </summary>
    public static readonly NumericField NotPresent = new(null, FieldPresence.NotPresent);
 

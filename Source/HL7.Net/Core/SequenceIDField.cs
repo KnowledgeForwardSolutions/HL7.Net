@@ -7,7 +7,7 @@
 public sealed record SequenceIDField
 {
    /// <summary>
-   ///   Represents an sequence id field that is not present.
+   ///   Represents a sequence id field that is not present.
    /// </summary>
    public static readonly SequenceIDField NotPresent = new(null, FieldPresence.NotPresent);
 

@@ -132,6 +132,9 @@
   <data name="InvalidRepetitionSpecification" xml:space="preserve">
     <value>Value is not 'N', 'Y' or a integer greater than one (1)</value>
   </data>
+  <data name="InvalidTimestampDegreeOfPrecision" xml:space="preserve">
+    <value>Field {0} contains data that is not a valid timestamp degree of precision value</value>
+  </data>
   <data name="InvalidTimestampValue" xml:space="preserve">
     <value>Field {0} contains data that could not be parsed as an timestamp value</value>
   </data>

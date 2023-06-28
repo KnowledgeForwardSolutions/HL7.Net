@@ -1,17 +1,16 @@
 ﻿namespace HL7.Net.Tests.Unit.Core;
 
-public class DateTimeComponentTests
+public class DegreeOfPrecisionComponentTests
 {
    private static readonly EncodingDetails _encodingDetails = EncodingDetails.DefaultEncodingDetails;
    private static readonly FieldSpecification _fieldSpecification = new(
-      "TS",
+      "TST",
       1,
-      "DateTime",
-      26,
-      HL7Datatype.DateTimeComponent,
-      Optionality.Required,
+      "DegreeOfPrecision",
+      1,
+      HL7Datatype.TimestampDegreeOfPrecisionComponent,
+      Optionality.Optional,
       "N");
-   private static readonly TimeSpan _defaultTimezoneOffset = new TimeSpan(-1, 0, 0);
    private const Int32 _lineNumber = 10;
 
    #region Internal Constructor Tests
@@ -19,12 +18,12 @@ public class DateTimeComponentTests
    // ==========================================================================
 
    [Fact]
-   public void DateTimeComponent_Constructor_ShouldCreateObject_WhenValueIsSupplied()
+   public void DegreeOfPrecisionComponent_Constructor_ShouldCreateObject_WhenValueIsSupplied()
    {
-      var value = new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 21, 223, 4), new TimeSpan(6, 0, 0));
+      var value = 'Y';
 
       // Act.
-      var sut = new DateTimeComponent(value);
+      var sut = new DegreeOfPrecisionComponent(value);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -33,12 +32,12 @@ public class DateTimeComponentTests
    }
 
    [Fact]
-   public void DateTimeComponent_Constructor_ShouldCreateObject_WhenValueAndFieldPresenceAreSupplied()
+   public void DegreeOfPrecisionComponent_Constructor_ShouldCreateObject_WhenValueAndFieldPresenceAreSupplied()
    {
-      DateTimeOffset? value = null!;
+      Char? value = null!;
 
       // Act.
-      var sut = new DateTimeComponent(value, FieldPresence.NotPresent);
+      var sut = new DegreeOfPrecisionComponent(value, FieldPresence.NotPresent);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -48,32 +47,32 @@ public class DateTimeComponentTests
 
    #endregion
 
-   #region Implicit DateTime Converter Tests
+   #region Implicit Char Converter Tests
    // ==========================================================================
    // ==========================================================================
 
    [Fact]
-   public void DateTimeComponent_ImplicitDecimalConverter_ShouldReturnExpectedValue_WhenFieldIsNotEmpty()
+   public void DegreeOfPrecisionComponent_ImplicitCharConverter_ShouldReturnExpectedValue_WhenFieldIsNotEmpty()
    {
       // Arrange.
-      var value = new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 21, 223, 4), new TimeSpan(6, 0, 0));
-      var sut = new DateTimeComponent(value);
+      var value = 'L';
+      var sut = new DegreeOfPrecisionComponent(value);
 
       // Act.
-      DateTimeOffset? result = sut;
+      Char? result = sut;
 
       // Assert.
       result.Should().Be(value);
    }
 
    [Fact]
-   public void DateTimeComponent_ImplicitDecimalConverter_ShouldReturnExpectedValue_WhenFieldIsNotPresent()
+   public void DegreeOfPrecisionComponent_ImplicitCharConverter_ShouldReturnExpectedValue_WhenFieldIsNotPresent()
    {
       // Arrange.
-      var sut = DateTimeComponent.NotPresent;
+      var sut = DegreeOfPrecisionComponent.NotPresent;
 
       // Act.
-      DateTimeOffset? result = sut;
+      Char? result = sut;
 
       // Assert.
       result.Should().BeNull();
@@ -86,10 +85,10 @@ public class DateTimeComponentTests
    // ==========================================================================
 
    [Fact]
-   public void DateTimeComponent_NotPresent_ShouldReturnExpectedValue()
+   public void DegreeOfPrecisionComponent_NotPresent_ShouldReturnExpectedValue()
    {
       // Act.
-      var sut = DateTimeComponent.NotPresent;
+      var sut = DegreeOfPrecisionComponent.NotPresent;
 
       // Assert.
       sut.Should().NotBeNull();
@@ -104,10 +103,10 @@ public class DateTimeComponentTests
    // ==========================================================================
 
    [Fact]
-   public void DateTimeComponent_PresentButNull_ShouldReturnExpectedValue()
+   public void DegreeOfPrecisionComponent_PresentButNull_ShouldReturnExpectedValue()
    {
       // Act.
-      var sut = DateTimeComponent.PresentButNull;
+      var sut = DegreeOfPrecisionComponent.PresentButNull;
 
       // Assert.
       sut.Should().NotBeNull();
@@ -121,38 +120,27 @@ public class DateTimeComponentTests
    // ==========================================================================
    // ==========================================================================
 
-   public static TheoryData<String, DateTimeOffset> ValidDateTimeData => new()
-   {
-      { "20230608", new DateTimeOffset(new DateTime(2023, 6, 8), _defaultTimezoneOffset) },
-      { "20230608+0800", new DateTimeOffset(new DateTime(2023, 6, 8), new TimeSpan(8, 0, 0)) },
-      { "202306081920", new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 0), _defaultTimezoneOffset) },
-      { "202306080000", new DateTimeOffset(new DateTime(2023, 6, 8, 0, 0, 0), _defaultTimezoneOffset) },
-      { "202306081920-0330", new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 0), new TimeSpan(-3, -30, 0)) },
-      { "20230608192021", new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 21), _defaultTimezoneOffset) },
-      { "20230608192021+1100", new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 21), new TimeSpan(11, 0, 0)) },
-      { "20230608192021.2234", new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 21, 223, 400), _defaultTimezoneOffset) },
-      { "20230608192021.2234+0600", new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 21, 223, 400), new TimeSpan(6, 0, 0)) },
-      { "20230608192021.2234-0700", new DateTimeOffset(new DateTime(2023, 6, 8, 19, 20, 21, 223, 400), new TimeSpan(-7, 0, 0)) },
-   };
-
    [Theory]
-   [MemberData(nameof(ValidDateTimeData))]
-   public void DateTimeComponent_Parse_ShouldReturnDateTimeValue_WhenFieldContainsValidTimestampValue(
-      String fieldContents,
-      DateTimeOffset expectedValue)
+   [InlineData('Y')]
+   [InlineData('L')]
+   [InlineData('D')]
+   [InlineData('H')]
+   [InlineData('M')]
+   [InlineData('S')]
+   public void DegreeOfPrecisionComponent_Parse_ShouldReturnIntegerValue_WhenFieldContainsValidDegreeOfPrecisionValue(Char fieldContents)
    {
       // Arrange.
-      var line = $"{fieldContents}^M".AsSpan();
+      var line = $"20230608192021.2234^{fieldContents}".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      var expected = new DateTimeComponent(expectedValue);
+      var expected = new DegreeOfPrecisionComponent(fieldContents);
 
       // Act.
-      var field = DateTimeComponent.Parse(
+      var field = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -161,12 +149,13 @@ public class DateTimeComponentTests
    }
 
    [Fact]
-   public void DateTimeComponent_Parse_ShouldLogExpectedEntry_WhenFieldContainsValidTimestampValue()
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogExpectedEntry_WhenFieldContainsValidDegreeOfPrecisionValue()
    {
       // Arrange.
-      var fieldContents = "20230608192021.2234+0600";
-      var line = $"{fieldContents}^M".AsSpan();
+      var fieldContents = "H";
+      var line = $"20230608192021.2234^{fieldContents}".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
       var message = String.Format(Messages.LogFieldPresent, _fieldSpecification.FieldDescription);
@@ -179,10 +168,9 @@ public class DateTimeComponentTests
          fieldContents);
 
       // Act.
-      _ = DateTimeComponent.Parse(
+      _ = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -192,63 +180,46 @@ public class DateTimeComponentTests
    }
 
    [Theory]
-   [InlineData("20232201")]            // Invalid month
-   [InlineData("20231033")]            // Invalid day
-   [InlineData("2023010133")]          // Invalid hour
-   [InlineData("202301011077")]        // Invalid second
-   [InlineData("2023112")]             // Shorter than accepted format
-   [InlineData("202311221")]
-   [InlineData("20231122112")]
-   [InlineData("2023112211223")]
-   [InlineData("20231122112233.111")]
-   [InlineData("20231122112233.1111+601")]
-   [InlineData("asdf")]
-   [InlineData(" 20230101")]           // Leading/trailing whitespace
-   [InlineData("20230101 ")]
-   [InlineData(" 20230101 ")]
-   public void DateTimeComponent_Parse_ShouldReturnNotPresentInstance_WhenFieldContainsAnInvalidTimestampValue(String fieldContents)
+   [InlineData("X")]
+   [InlineData("YY")]
+   [InlineData(" Y")]
+   [InlineData("Y ")]
+   [InlineData(" Y ")]
+   public void DegreeOfPrecisionComponent_Parse_ShouldReturnNotPresentInstance_WhenFieldContainsAnInvalidTimestampValue(String fieldContents)
    {
       // Arrange.
-      var line = $"{fieldContents}^M".AsSpan();
+      var line = $"20230608192021.2234^{fieldContents}".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
       // Act.
-      var field = DateTimeComponent.Parse(
+      var field = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(DateTimeComponent.NotPresent);
+      field.Should().Be(DegreeOfPrecisionComponent.NotPresent);
    }
 
    [Theory]
-   [InlineData("20232201")]            // Invalid month
-   [InlineData("20231033")]            // Invalid day
-   [InlineData("2023010133")]          // Invalid hour
-   [InlineData("202301011077")]        // Invalid second
-   [InlineData("2023112")]             // Shorter than accepted format
-   [InlineData("202311221")]
-   [InlineData("20231122112")]
-   [InlineData("2023112211223")]
-   [InlineData("20231122112233.111")]
-   [InlineData("20231122112233.1111+601")]
-   [InlineData("asdf")]
-   [InlineData(" 20230101")]           // Leading/trailing whitespace
-   [InlineData("20230101 ")]
-   [InlineData(" 20230101 ")]
-   public void DateTimeComponent_Parse_ShouldLogError_WhenFieldContainsAnInvalidNumericValue(String fieldContents)
+   [InlineData("X")]
+   [InlineData("YY")]
+   [InlineData(" Y")]
+   [InlineData("Y ")]
+   [InlineData(" Y ")]
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogError_WhenFieldContainsAnInvalidNumericValue(String fieldContents)
    {
       // Arrange.
-      var line = $"{fieldContents}^M".AsSpan();
+      var line = $"20230608192021.2234^{fieldContents}".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
       var message = String.Format(
-         Messages.InvalidTimestampValue,
+         Messages.InvalidTimestampDegreeOfPrecision,
          _fieldSpecification.FieldDescription);
       var expectedLogEntry = new LogEntry(
          LogLevel.Error,
@@ -258,10 +229,9 @@ public class DateTimeComponentTests
          fieldContents);
 
       // Act.
-      _ = DateTimeComponent.Parse(
+      _ = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -273,10 +243,10 @@ public class DateTimeComponentTests
    [Theory]
    [InlineData(Optionality.Optional)]
    [InlineData(Optionality.Required)]
-   public void DateTimeComponent_Parse_ShouldReturnNotPresentInstance_WhenFieldIsBeyondEndOfSuppliedFields(Optionality optionality)
+   public void DegreeOfPrecisionComponent_Parse_ShouldReturnNotPresentInstance_WhenFieldIsBeyondEndOfSuppliedFields(Optionality optionality)
    {
       // Arrange.
-      var line = $"asdf^M".AsSpan();
+      var line = $"20230608192021.2234".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       fieldEnumerator.MoveNext();
@@ -284,22 +254,21 @@ public class DateTimeComponentTests
       var fieldSpecification = _fieldSpecification with { Optionality = optionality, Sequence = 2 };
 
       // Act.
-      var field = DateTimeComponent.Parse(
+      var field = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(DateTimeComponent.NotPresent);
+      field.Should().Be(DegreeOfPrecisionComponent.NotPresent);
    }
 
    [Fact]
-   public void DateTimeComponent_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsBeyondEndOfSuppliedFields()
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsBeyondEndOfSuppliedFields()
    {
       // Arrange.
-      var line = $"asdf^M".AsSpan();
+      var line = $"20230608192021.2234".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       fieldEnumerator.MoveNext();
@@ -316,10 +285,9 @@ public class DateTimeComponentTests
          fieldSpecification.FieldDescription);
 
       // Act.
-      _ = DateTimeComponent.Parse(
+      _ = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -329,10 +297,10 @@ public class DateTimeComponentTests
    }
 
    [Fact]
-   public void DateTimeComponent_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsBeyondEndOfSuppliedFields()
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsBeyondEndOfSuppliedFields()
    {
       // Arrange.
-      var line = $"asdf^M".AsSpan();
+      var line = $"20230608192021.2234".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       fieldEnumerator.MoveNext();
@@ -349,10 +317,9 @@ public class DateTimeComponentTests
          fieldSpecification.FieldDescription);
 
       // Act.
-      _ = DateTimeComponent.Parse(
+      _ = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -364,32 +331,33 @@ public class DateTimeComponentTests
    [Theory]
    [InlineData(Optionality.Optional)]
    [InlineData(Optionality.Required)]
-   public void DateTimeComponent_Parse_ShouldReturnNotPresentInstance_WhenFieldIsEmpty(Optionality optionality)
+   public void DegreeOfPrecisionComponent_Parse_ShouldReturnNotPresentInstance_WhenFieldIsEmpty(Optionality optionality)
    {
       // Arrange.
-      var line = $"^M".AsSpan();
+      var line = $"20230608192021.2234^".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
       var fieldSpecification = _fieldSpecification with { Optionality = optionality };
 
       // Act.
-      var field = DateTimeComponent.Parse(
+      var field = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(DateTimeComponent.NotPresent);
+      field.Should().Be(DegreeOfPrecisionComponent.NotPresent);
    }
 
    [Fact]
-   public void DateTimeComponent_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsEmpty()
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsEmpty()
    {
       // Arrange.
-      var line = $"^M".AsSpan();
+      var line = $"20230608192021.2234^".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
       var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Optional };
 
@@ -403,10 +371,9 @@ public class DateTimeComponentTests
          fieldSpecification.FieldDescription);
 
       // Act.
-      _ = DateTimeComponent.Parse(
+      _ = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -416,11 +383,12 @@ public class DateTimeComponentTests
    }
 
    [Fact]
-   public void DateTimeComponent_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsEmpty()
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsEmpty()
    {
       // Arrange.
-      var line = $"^M".AsSpan();
+      var line = $"20230608192021.2234^".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
       var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Required };
@@ -434,10 +402,9 @@ public class DateTimeComponentTests
          fieldSpecification.FieldDescription);
 
       // Act.
-      _ = DateTimeComponent.Parse(
+      _ = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -447,31 +414,32 @@ public class DateTimeComponentTests
    }
 
    [Fact]
-   public void DateTimeComponent_Parse_ShouldReturnPresentButNullInstance_WhenFieldIsTwoDoubleQuotes()
+   public void DegreeOfPrecisionComponent_Parse_ShouldReturnPresentButNullInstance_WhenFieldIsTwoDoubleQuotes()
    {
       // Arrange.
-      var line = "\"\"^M".AsSpan();
+      var line = $"20230608192021.2234^\"\"".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
       // Act.
-      var field = DateTimeComponent.Parse(
+      var field = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(DateTimeComponent.PresentButNull);
+      field.Should().Be(DegreeOfPrecisionComponent.PresentButNull);
    }
 
    [Fact]
-   public void DateTimeComponent_Parse_ShouldLogFieldPresentButNull_WhenFieldIsTwoDoubleQuotes()
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogFieldPresentButNull_WhenFieldIsTwoDoubleQuotes()
    {
       // Arrange.
-      var line = "\"\"^M".AsSpan();
+      var line = $"20230608192021.2234^\"\"".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
       var message = String.Format(
@@ -485,10 +453,9 @@ public class DateTimeComponentTests
          GeneralConstants.PresentButNullValue);
 
       // Act.
-      _ = DateTimeComponent.Parse(
+      _ = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 

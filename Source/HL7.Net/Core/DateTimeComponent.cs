@@ -15,7 +15,7 @@ public sealed record DateTimeComponent
    };
 
    /// <summary>
-   ///   Represents an date/time component that is not present.
+   ///   Represents a date/time component that is not present.
    /// </summary>
    public static readonly DateTimeComponent NotPresent = new(null, FieldPresence.NotPresent);
 

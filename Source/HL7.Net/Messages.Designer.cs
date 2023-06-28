@@ -106,6 +106,15 @@ namespace HL7.Net {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Field {0} contains data that is not a valid timestamp degree of precision value.
+        /// </summary>
+        internal static string InvalidTimestampDegreeOfPrecision {
+            get {
+                return ResourceManager.GetString("InvalidTimestampDegreeOfPrecision", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Field {0} contains data that could not be parsed as an timestamp value.
         /// </summary>
         internal static string InvalidTimestampValue {
