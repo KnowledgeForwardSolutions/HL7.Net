@@ -70,15 +70,6 @@ namespace HL7.Net {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Field {0} contains data that could not be parsed as an integer value.
-        /// </summary>
-        internal static string InvalidIntegerNumericValue {
-            get {
-                return ResourceManager.GetString("InvalidIntegerNumericValue", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Value must be an integer greater than zero (0) or minus one (-1) to indicate that the field allows unlimited length.
         /// </summary>
         internal static string InvalidMaxLength {
@@ -111,6 +102,24 @@ namespace HL7.Net {
         internal static string InvalidRepetitionSpecification {
             get {
                 return ResourceManager.GetString("InvalidRepetitionSpecification", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Field {0} contains data that is not a valid timestamp degree of precision value.
+        /// </summary>
+        internal static string InvalidTimestampDegreeOfPrecision {
+            get {
+                return ResourceManager.GetString("InvalidTimestampDegreeOfPrecision", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Field {0} contains data that could not be parsed as an timestamp value.
+        /// </summary>
+        internal static string InvalidTimestampValue {
+            get {
+                return ResourceManager.GetString("InvalidTimestampValue", resourceCulture);
             }
         }
         

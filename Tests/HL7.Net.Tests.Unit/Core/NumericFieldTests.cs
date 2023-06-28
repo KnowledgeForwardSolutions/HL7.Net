@@ -28,21 +28,21 @@ public class NumericFieldTests
       // Assert.
       sut.Should().NotBeNull();
       sut.Value.Should().Be(value);
-      sut.FieldPresence.Should().Be(FieldPresence.Present);
+      sut.Presence.Should().Be(Presence.Present);
    }
 
    [Fact]
    public void NumericField_Constructor_ShouldCreateObject_WhenValueAndFieldPresenceAreSupplied()
    {
-      var value = 42.42M;
+      Decimal? value = null!;
 
       // Act.
-      var sut = new NumericField(value, FieldPresence.NotPresent);
+      var sut = new NumericField(value, Presence.NotPresent);
 
       // Assert.
       sut.Should().NotBeNull();
       sut.Value.Should().Be(value);
-      sut.FieldPresence.Should().Be(FieldPresence.NotPresent);
+      sut.Presence.Should().Be(Presence.NotPresent);
    }
 
    #endregion
@@ -80,7 +80,7 @@ public class NumericFieldTests
 
    #endregion
 
-   #region NotPresent Property Tests
+   #region NotPresent Instance Tests
    // ==========================================================================
    // ==========================================================================
 
@@ -93,12 +93,12 @@ public class NumericFieldTests
       // Assert.
       sut.Should().NotBeNull();
       sut.Value.Should().BeNull();
-      sut.FieldPresence.Should().Be(FieldPresence.NotPresent);
+      sut.Presence.Should().Be(Presence.NotPresent);
    }
 
    #endregion
 
-   #region PresentButNull Property Tests
+   #region PresentButNull Instance Tests
    // ==========================================================================
    // ==========================================================================
 
@@ -111,7 +111,7 @@ public class NumericFieldTests
       // Assert.
       sut.Should().NotBeNull();
       sut.Value.Should().BeNull();
-      sut.FieldPresence.Should().Be(FieldPresence.PresentButNull);
+      sut.Presence.Should().Be(Presence.PresentButNull);
    }
 
    #endregion
@@ -128,7 +128,7 @@ public class NumericFieldTests
    [InlineData("12345678 ", 12345678)]
    [InlineData("1234.567", 1234.567)]
    [InlineData("-1234.56", -1234.56)]
-   public void NumericField_Parse_ShouldReturnIntegerValue_WhenFieldContainsValidNumericValue(
+   public void NumericField_Parse_ShouldReturnDecimalValue_WhenFieldContainsValidNumericValue(
       String fieldContents,
       Decimal expectedValue)
    {
@@ -357,7 +357,7 @@ public class NumericFieldTests
       // Act.
       _ = NumericField.Parse(
          ref fieldEnumerator,
-         _fieldSpecification,
+         fieldSpecification,
          _lineNumber,
          log);
 

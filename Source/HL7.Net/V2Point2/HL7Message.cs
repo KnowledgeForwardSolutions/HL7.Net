@@ -19,6 +19,7 @@ public sealed class HL7Message : IHL7Message
    /// </returns>
    public static HL7Message Parse(
       ReadOnlySpan<Char> messageText,
+      TimeSpan defaultTimezoneOffset,
       out ProcessingLog log)
    {
       log = new ProcessingLog();
@@ -40,11 +41,12 @@ public sealed class HL7Message : IHL7Message
                SegmentIDs.EventTypeSegment => EventTypeSegment.Parse(
                   line,
                   encodingDetails,
+                  defaultTimezoneOffset,
                   lineNumber, 
                   log),
                SegmentIDs.MessageHeaderSegment => MessageHeaderSegment.Parse(
                   line,
-                  ref encodingDetails,
+                  defaultTimezoneOffset,
                   lineNumber, 
                   log),
                SegmentIDs.NextOfKinSegment => NextOfKinSegment.Parse(
@@ -55,19 +57,26 @@ public sealed class HL7Message : IHL7Message
                SegmentIDs.PatientIdentificationSegment => PatientIdentificationSegment.Parse(
                   line,
                   encodingDetails,
+                  defaultTimezoneOffset,
                   lineNumber,
                   log),
                SegmentIDs.PatientVisitSegment => PatientVisitSegment.Parse(
                   line,
                   encodingDetails,
+                  defaultTimezoneOffset,
                   lineNumber,
                   log),
-               _ => UnrecognizedSegment(log, lineNumber, segmentID)
+               _ => UnrecognizedSegment(log, lineNumber, line.ToString())
             };
 
             if (segment is not null)
             {
                message._segments.Add(segment);
+               if (segment.SegmentID == SegmentIDs.MessageHeaderSegment)
+               {
+                  var msh = segment as MessageHeaderSegment;
+                  HandleHeader(msh!, ref encodingDetails, ref defaultTimezoneOffset);
+               }
             }
          }
          lineNumber++;
@@ -76,14 +85,47 @@ public sealed class HL7Message : IHL7Message
       return message;
    }
 
+   /// <summary>
+   ///  If a new header segment was encountered (BSH, FSH, MSH) then update the
+   ///  encoding details and default timezone offset to use while parsing 
+   ///  following segments.
+   /// </summary>
+   /// <param name="header">
+   ///   The new header segment.
+   /// </param>
+   /// <param name="encodingDetails">
+   ///   The encoding details to use when parsing a segment.
+   /// </param>
+   /// <param name="defaultTimezoneOffset">
+   ///   The default timezone offset to use when parsing time or timestamp 
+   ///   fields.
+   /// </param>
+   private static void HandleHeader(
+      MessageHeaderSegment header,
+      ref EncodingDetails encodingDetails,
+      ref TimeSpan defaultTimezoneOffset)
+   {
+      encodingDetails = new EncodingDetails(
+         header!.FieldSeparator,
+         header.EncodingCharacters.ComponentSeparator,
+         header.EncodingCharacters.RepetitionSeparator,
+         header.EncodingCharacters.EscapeCharacter,
+         header.EncodingCharacters.SubComponentSeparator);
+      if (header.DateTimeOfMessage.IsPresentNotNull())
+      {
+         defaultTimezoneOffset = ((DateTimeOffset)header.DateTimeOfMessage.Timestamp.Value!).Offset;
+      }
+   }
+
    private static ISegment UnrecognizedSegment(
       ProcessingLog log,
       Int32 lineNumber, 
-      String segmentID)
+      String line)
    {
       log.LogError(
          "Unrecognized segment ID",
-         lineNumber);
+         lineNumber,
+         rawData: line);
 
       return null!;
    }

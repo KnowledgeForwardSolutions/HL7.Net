@@ -3,7 +3,7 @@
 /// <summary>
 ///   Defines the options for a field to be present in an HL7 message.
 /// </summary>
-public enum FieldPresence
+public enum Presence
 {
    /// <summary>
    ///  The field is not present.

@@ -120,9 +120,6 @@
   <data name="InvalidFieldSeparator" xml:space="preserve">
     <value>Field separator character may not be carriage return (hex 0D)</value>
   </data>
-  <data name="InvalidIntegerNumericValue" xml:space="preserve">
-    <value>Field {0} contains data that could not be parsed as an integer value</value>
-  </data>
   <data name="InvalidMaxLength" xml:space="preserve">
     <value>Value must be an integer greater than zero (0) or minus one (-1) to indicate that the field allows unlimited length</value>
   </data>
@@ -134,6 +131,12 @@
   </data>
   <data name="InvalidRepetitionSpecification" xml:space="preserve">
     <value>Value is not 'N', 'Y' or a integer greater than one (1)</value>
+  </data>
+  <data name="InvalidTimestampDegreeOfPrecision" xml:space="preserve">
+    <value>Field {0} contains data that is not a valid timestamp degree of precision value</value>
+  </data>
+  <data name="InvalidTimestampValue" xml:space="preserve">
+    <value>Field {0} contains data that could not be parsed as an timestamp value</value>
   </data>
   <data name="LogDuplicateEncodingCharacter" xml:space="preserve">
     <value>Field {0} has duplicate encoding character {1}</value>

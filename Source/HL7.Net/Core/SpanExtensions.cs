@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace HL7.Net.Core;
+﻿namespace HL7.Net.Core;
 
 public static class SpanExtensions
 {

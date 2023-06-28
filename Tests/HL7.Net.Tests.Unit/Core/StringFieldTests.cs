@@ -31,21 +31,21 @@ public class StringFieldTests
       // Assert.
       sut.Should().NotBeNull();
       sut.Value.Should().Be(value);
-      sut.FieldPresence.Should().Be(FieldPresence.Present);
+      sut.Presence.Should().Be(Presence.Present);
    }
 
    [Fact]
    public void StringField_Constructor_ShouldCreateObject_WhenStringValueAndFieldPresenceAreSupplied()
    {
-      var value = "asdf";
+      String? value = null!;
 
       // Act.
-      var sut = new StringField(value, FieldPresence.NotPresent);
+      var sut = new StringField(value, Presence.NotPresent);
 
       // Assert.
       sut.Should().NotBeNull();
       sut.Value.Should().Be(value);
-      sut.FieldPresence.Should().Be(FieldPresence.NotPresent);
+      sut.Presence.Should().Be(Presence.NotPresent);
    }
 
    #endregion
@@ -62,7 +62,7 @@ public class StringFieldTests
       var sut = new StringField(text);
 
       // Act.
-      String str = sut;
+      String? str = sut;
 
       // Assert.
       str.Should().Be(text);
@@ -75,7 +75,7 @@ public class StringFieldTests
       var sut = StringField.NotPresent;
 
       // Act.
-      String str = sut;
+      String? str = sut;
 
       // Assert.
       str.Should().BeNull();
@@ -83,7 +83,7 @@ public class StringFieldTests
 
    #endregion
 
-   #region NotPresent Property Tests
+   #region NotPresent Instance Tests
    // ==========================================================================
    // ==========================================================================
 
@@ -96,12 +96,12 @@ public class StringFieldTests
       // Assert.
       sut.Should().NotBeNull();
       sut.Value.Should().BeNull();
-      sut.FieldPresence.Should().Be(FieldPresence.NotPresent);
+      sut.Presence.Should().Be(Presence.NotPresent);
    }
 
    #endregion
 
-   #region PresentButNull Property Tests
+   #region PresentButNull Instance Tests
    // ==========================================================================
    // ==========================================================================
 
@@ -114,7 +114,7 @@ public class StringFieldTests
       // Assert.
       sut.Should().NotBeNull();
       sut.Value.Should().BeNull();
-      sut.FieldPresence.Should().Be(FieldPresence.PresentButNull);
+      sut.Presence.Should().Be(Presence.PresentButNull);
    }
 
    #endregion

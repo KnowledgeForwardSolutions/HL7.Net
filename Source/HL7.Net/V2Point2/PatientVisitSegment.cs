@@ -306,13 +306,13 @@ public class PatientVisitSegment : ISegment
    ///   Admit date/time. To be used if the event date/time is different than 
    ///   the admit date and time, i.e., a retroactive update.
    /// </summary>
-   public StringField AdmitDateTime { get; private set; } = default!;
+   public TimestampField AdmitDateTime { get; private set; } = default!;
 
    /// <summary>
    ///   Discharge date/time. To be used if the event date/time is different 
    ///   than the discharge date and time, i.e., a retroactive update.
    /// </summary>
-   public StringField DischargeDateTime { get; private set; } = default!;
+   public TimestampField DischargeDateTime { get; private set; } = default!;
 
    /// <summary>
    ///   Visit balance due. 
@@ -342,6 +342,7 @@ public class PatientVisitSegment : ISegment
    internal static PatientVisitSegment Parse(
       ReadOnlySpan<Char> segmentText,
       EncodingDetails encodingDetails,
+      TimeSpan defaultTimezoneOffset,
       Int32 lineNumber,
       ProcessingLog log)
    {
@@ -650,17 +651,19 @@ public class PatientVisitSegment : ISegment
          lineNumber,
          log);
 
-      segment.AdmitDateTime = StringField.Parse(
+      segment.AdmitDateTime = TimestampField.Parse(
          ref fieldEnumerator,
          encodingDetails,
          _fieldSpecifications[43],
+         defaultTimezoneOffset,
          lineNumber,
          log);
 
-      segment.DischargeDateTime = StringField.Parse(
+      segment.DischargeDateTime = TimestampField.Parse(
          ref fieldEnumerator,
          encodingDetails,
          _fieldSpecifications[44],
+         defaultTimezoneOffset,
          lineNumber,
          log);
 

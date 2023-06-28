@@ -1,14 +1,14 @@
 ﻿namespace HL7.Net.Tests.Unit.Core;
 
-public class SequenceIdFieldTests
+public class DegreeOfPrecisionComponentTests
 {
    private static readonly EncodingDetails _encodingDetails = EncodingDetails.DefaultEncodingDetails;
    private static readonly FieldSpecification _fieldSpecification = new(
       "TST",
       1,
-      "Test Field",
-      4,
-      HL7Datatype.SI_SequenceID,
+      "DegreeOfPrecision",
+      1,
+      HL7Datatype.TimestampDegreeOfPrecisionComponent,
       Optionality.Optional,
       "N");
    private const Int32 _lineNumber = 10;
@@ -18,12 +18,12 @@ public class SequenceIdFieldTests
    // ==========================================================================
 
    [Fact]
-   public void SequenceIDField_Constructor_ShouldCreateObject_WhenValueIsSupplied()
+   public void DegreeOfPrecisionComponent_Constructor_ShouldCreateObject_WhenValueIsSupplied()
    {
-      var value = 42;
+      var value = 'Y';
 
       // Act.
-      var sut = new SequenceIDField(value);
+      var sut = new DegreeOfPrecisionComponent(value);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -32,12 +32,12 @@ public class SequenceIdFieldTests
    }
 
    [Fact]
-   public void SequenceIDField_Constructor_ShouldCreateObject_WhenValueAndFieldPresenceAreSupplied()
+   public void DegreeOfPrecisionComponent_Constructor_ShouldCreateObject_WhenValueAndFieldPresenceAreSupplied()
    {
-      Int32? value = null!;
+      Char? value = null!;
 
       // Act.
-      var sut = new SequenceIDField(value, Presence.NotPresent);
+      var sut = new DegreeOfPrecisionComponent(value, Presence.NotPresent);
 
       // Assert.
       sut.Should().NotBeNull();
@@ -47,32 +47,32 @@ public class SequenceIdFieldTests
 
    #endregion
 
-   #region Implicit Integer Converter Tests
+   #region Implicit Char Converter Tests
    // ==========================================================================
    // ==========================================================================
 
    [Fact]
-   public void SequenceIDField_ImplicitIntegerConverter_ShouldReturnExpectedValue_WhenFieldIsNotEmpty()
+   public void DegreeOfPrecisionComponent_ImplicitCharConverter_ShouldReturnExpectedValue_WhenFieldIsNotEmpty()
    {
       // Arrange.
-      var value = 42;
-      var sut = new SequenceIDField(value);
+      var value = 'L';
+      var sut = new DegreeOfPrecisionComponent(value);
 
       // Act.
-      Decimal? result = sut;
+      Char? result = sut;
 
       // Assert.
       result.Should().Be(value);
    }
 
    [Fact]
-   public void SequenceIDField_ImplicitIntegerConverter_ShouldReturnExpectedValue_WhenFieldIsNotPresent()
+   public void DegreeOfPrecisionComponent_ImplicitCharConverter_ShouldReturnExpectedValue_WhenFieldIsNotPresent()
    {
       // Arrange.
-      var sut = SequenceIDField.NotPresent;
+      var sut = DegreeOfPrecisionComponent.NotPresent;
 
       // Act.
-      Decimal? result = sut;
+      Char? result = sut;
 
       // Assert.
       result.Should().BeNull();
@@ -85,10 +85,10 @@ public class SequenceIdFieldTests
    // ==========================================================================
 
    [Fact]
-   public void SequenceIDField_NotPresent_ShouldReturnExpectedValue()
+   public void DegreeOfPrecisionComponent_NotPresent_ShouldReturnExpectedValue()
    {
       // Act.
-      var sut = SequenceIDField.NotPresent;
+      var sut = DegreeOfPrecisionComponent.NotPresent;
 
       // Assert.
       sut.Should().NotBeNull();
@@ -103,10 +103,10 @@ public class SequenceIdFieldTests
    // ==========================================================================
 
    [Fact]
-   public void SequenceIDField_PresentButNull_ShouldReturnExpectedValue()
+   public void DegreeOfPrecisionComponent_PresentButNull_ShouldReturnExpectedValue()
    {
       // Act.
-      var sut = SequenceIDField.PresentButNull;
+      var sut = DegreeOfPrecisionComponent.PresentButNull;
 
       // Assert.
       sut.Should().NotBeNull();
@@ -121,22 +121,24 @@ public class SequenceIdFieldTests
    // ==========================================================================
 
    [Theory]
-   [InlineData("42", 42)]
-   [InlineData("1234 ", 1234)]
-   public void SequenceIDField_Parse_ShouldReturnIntegerValue_WhenFieldContainsValidIntegerValue(
-      String fieldContents,
-      Int32 expectedValue)
+   [InlineData('Y')]
+   [InlineData('L')]
+   [InlineData('D')]
+   [InlineData('H')]
+   [InlineData('M')]
+   [InlineData('S')]
+   public void DegreeOfPrecisionComponent_Parse_ShouldReturnIntegerValue_WhenFieldContainsValidDegreeOfPrecisionValue(Char fieldContents)
    {
       // Arrange.
-      var line = $"TST|{fieldContents}|This is a test...|This is only a test...".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      var line = $"20230608192021.2234^{fieldContents}".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      var expected = new SequenceIDField(expectedValue);
+      var expected = new DegreeOfPrecisionComponent(fieldContents);
 
       // Act.
-      var field = SequenceIDField.Parse(
+      var field = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
          _lineNumber,
@@ -147,12 +149,12 @@ public class SequenceIdFieldTests
    }
 
    [Fact]
-   public void SequenceIDField_Parse_ShouldLogExpectedEntry_WhenFieldContainsValidIntegerValue()
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogExpectedEntry_WhenFieldContainsValidDegreeOfPrecisionValue()
    {
       // Arrange.
-      var fieldContents = "42";
-      var line = $"TST|{fieldContents}|This is a test...|This is only a test...".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      var fieldContents = "H";
+      var line = $"20230608192021.2234^{fieldContents}".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
@@ -166,7 +168,7 @@ public class SequenceIdFieldTests
          fieldContents);
 
       // Act.
-      _ = SequenceIDField.Parse(
+      _ = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
          _lineNumber,
@@ -178,66 +180,46 @@ public class SequenceIdFieldTests
    }
 
    [Theory]
-   [InlineData("$42")]
-   [InlineData("42GBP")]
-   [InlineData("42-")]
-   [InlineData("(42)")]
-   [InlineData(" 42")]
-   [InlineData("42 ")]
-   [InlineData(" 42 ")]
-   [InlineData("   ")]
-   [InlineData("42,000")]
-   [InlineData("42E-3")]
-   [InlineData("+42")]
-   [InlineData("-42")]
-   [InlineData("42.42")]
-   [InlineData("123.4567")]
-   [InlineData("-123.456")]
-   public void SequenceIDField_Parse_ShouldReturnNotPresentInstance_WhenFieldContainsAnInvalidIntegerValue(String fieldContents)
+   [InlineData("X")]
+   [InlineData("YY")]
+   [InlineData(" Y")]
+   [InlineData("Y ")]
+   [InlineData(" Y ")]
+   public void DegreeOfPrecisionComponent_Parse_ShouldReturnNotPresentInstance_WhenFieldContainsAnInvalidTimestampValue(String fieldContents)
    {
       // Arrange.
-      var line = $"TST|{fieldContents}|This is a test...|This is only a test...".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      var line = $"20230608192021.2234^{fieldContents}".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
       // Act.
-      var field = SequenceIDField.Parse(
+      var field = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(SequenceIDField.NotPresent);
+      field.Should().Be(DegreeOfPrecisionComponent.NotPresent);
    }
 
    [Theory]
-   [InlineData("$42")]
-   [InlineData("42GBP")]
-   [InlineData("42-")]
-   [InlineData("(42)")]
-   [InlineData(" 42")]
-   [InlineData("42 ")]
-   [InlineData(" 42 ")]
-   [InlineData("   ")]
-   [InlineData("42,000")]
-   [InlineData("42E-3")]
-   [InlineData("+42")]
-   [InlineData("-42")]
-   [InlineData("42.42")]
-   [InlineData("123.4567")]
-   [InlineData("-123.456")]
-   public void SequenceIDField_Parse_ShouldLogError_WhenFieldContainsAnInvalidIntegerValue(String fieldContents)
+   [InlineData("X")]
+   [InlineData("YY")]
+   [InlineData(" Y")]
+   [InlineData("Y ")]
+   [InlineData(" Y ")]
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogError_WhenFieldContainsAnInvalidNumericValue(String fieldContents)
    {
       // Arrange.
-      var line = $"TST|{fieldContents}|This is a test...|This is only a test...".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      var line = $"20230608192021.2234^{fieldContents}".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
       var message = String.Format(
-         Messages.InvalidNumericValue,
+         Messages.InvalidTimestampDegreeOfPrecision,
          _fieldSpecification.FieldDescription);
       var expectedLogEntry = new LogEntry(
          LogLevel.Error,
@@ -247,64 +229,7 @@ public class SequenceIdFieldTests
          fieldContents);
 
       // Act.
-      _ = SequenceIDField.Parse(
-         ref fieldEnumerator,
-         _fieldSpecification,
-         _lineNumber,
-         log);
-
-      // Assert.
-      log.Should().HaveCount(1);
-      log.First().Should().Be(expectedLogEntry);
-   }
-
-   [Fact]
-   public void SequenceIDField_Parse_ShouldTruncateValue_WhenFieldIsLongerThanMaxLength()
-   {
-      // Arrange.
-      var fieldContents = "123456";
-      var line = $"TST|{fieldContents}|This is a test...|This is only a test...".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
-      fieldEnumerator.MoveNext();
-      var log = new ProcessingLog();
-
-      var expectedValue = 1234;
-      var expected = new SequenceIDField(expectedValue);
-
-      // Act.
-      var field = SequenceIDField.Parse(
-         ref fieldEnumerator,
-         _fieldSpecification,
-         _lineNumber,
-         log);
-
-      // Assert.
-      field.Should().Be(expected);
-   }
-
-   [Fact]
-   public void SequenceIDField_Parse_ShouldLogExpectedEntry_WhenFieldIsLongerThanMaxLength()
-   {
-      // Arrange.
-      var fieldContents = "123456";
-      var line = $"TST|{fieldContents}|This is a test...|This is only a test...".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
-      fieldEnumerator.MoveNext();
-      var log = new ProcessingLog();
-
-      var message = String.Format(
-         Messages.LogFieldPresentButTruncated,
-         _fieldSpecification.FieldDescription,
-         _fieldSpecification.Length);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Warning,
-         message,
-         _lineNumber,
-         _fieldSpecification.FieldDescription,
-         fieldContents);
-
-      // Act.
-      _ = SequenceIDField.Parse(
+      _ = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
          _lineNumber,
@@ -318,33 +243,33 @@ public class SequenceIdFieldTests
    [Theory]
    [InlineData(Optionality.Optional)]
    [InlineData(Optionality.Required)]
-   public void SequenceIDField_Parse_ShouldReturnNotPresentInstance_WhenFieldIsBeyondEndOfSuppliedFields(Optionality optionality)
+   public void DegreeOfPrecisionComponent_Parse_ShouldReturnNotPresentInstance_WhenFieldIsBeyondEndOfSuppliedFields(Optionality optionality)
    {
       // Arrange.
-      var line = "TST|This is a test..".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      var line = $"20230608192021.2234".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
       var fieldSpecification = _fieldSpecification with { Optionality = optionality, Sequence = 2 };
 
       // Act.
-      var field = SequenceIDField.Parse(
+      var field = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          fieldSpecification,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(SequenceIDField.NotPresent);
+      field.Should().Be(DegreeOfPrecisionComponent.NotPresent);
    }
 
    [Fact]
-   public void SequenceIDField_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsBeyondEndOfSuppliedFields()
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsBeyondEndOfSuppliedFields()
    {
       // Arrange.
-      var line = "TST|This is a test..".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      var line = $"20230608192021.2234".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
@@ -360,9 +285,9 @@ public class SequenceIdFieldTests
          fieldSpecification.FieldDescription);
 
       // Act.
-      _ = SequenceIDField.Parse(
+      _ = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
-         _fieldSpecification,
+         fieldSpecification,
          _lineNumber,
          log);
 
@@ -372,11 +297,11 @@ public class SequenceIdFieldTests
    }
 
    [Fact]
-   public void SequenceIDField_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsBeyondEndOfSuppliedFields()
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsBeyondEndOfSuppliedFields()
    {
       // Arrange.
-      var line = "TST|This is a test..".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      var line = $"20230608192021.2234".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
@@ -392,7 +317,7 @@ public class SequenceIdFieldTests
          fieldSpecification.FieldDescription);
 
       // Act.
-      _ = SequenceIDField.Parse(
+      _ = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          fieldSpecification,
          _lineNumber,
@@ -406,48 +331,49 @@ public class SequenceIdFieldTests
    [Theory]
    [InlineData(Optionality.Optional)]
    [InlineData(Optionality.Required)]
-   public void SequenceIDField_Parse_ShouldReturnNotPresentInstance_WhenFieldIsEmpty(Optionality optionality)
+   public void DegreeOfPrecisionComponent_Parse_ShouldReturnNotPresentInstance_WhenFieldIsEmpty(Optionality optionality)
    {
       // Arrange.
-      var line = "TST||This is a test..".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      var line = $"20230608192021.2234^".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
       var fieldSpecification = _fieldSpecification with { Optionality = optionality };
 
       // Act.
-      var field = SequenceIDField.Parse(
+      var field = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          fieldSpecification,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(SequenceIDField.NotPresent);
+      field.Should().Be(DegreeOfPrecisionComponent.NotPresent);
    }
 
    [Fact]
-   public void SequenceIDField_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsEmpty()
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsEmpty()
    {
       // Arrange.
-      var line = "TST||This is a test..".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      var line = $"20230608192021.2234^".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
+      var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Optional };
 
       var message = String.Format(
          Messages.LogFieldNotPresent,
-         _fieldSpecification.FieldDescription);
+         fieldSpecification.FieldDescription);
       var expectedLogEntry = new LogEntry(
          LogLevel.Information,
          message,
          _lineNumber,
-         _fieldSpecification.FieldDescription);
+         fieldSpecification.FieldDescription);
 
       // Act.
-      _ = SequenceIDField.Parse(
+      _ = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
-         _fieldSpecification,
+         fieldSpecification,
          _lineNumber,
          log);
 
@@ -457,11 +383,11 @@ public class SequenceIdFieldTests
    }
 
    [Fact]
-   public void SequenceIDField_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsEmpty()
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsEmpty()
    {
       // Arrange.
-      var line = "TST||This is a test..".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      var line = $"20230608192021.2234^".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
@@ -476,7 +402,7 @@ public class SequenceIdFieldTests
          fieldSpecification.FieldDescription);
 
       // Act.
-      _ = SequenceIDField.Parse(
+      _ = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          fieldSpecification,
          _lineNumber,
@@ -488,31 +414,31 @@ public class SequenceIdFieldTests
    }
 
    [Fact]
-   public void SequenceIDField_Parse_ShouldReturnPresentButNullInstance_WhenFieldIsTwoDoubleQuotes()
+   public void DegreeOfPrecisionComponent_Parse_ShouldReturnPresentButNullInstance_WhenFieldIsTwoDoubleQuotes()
    {
       // Arrange.
-      var line = "TST|\"\"|This is a test..".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      var line = $"20230608192021.2234^\"\"".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
       // Act.
-      var field = SequenceIDField.Parse(
+      var field = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(SequenceIDField.PresentButNull);
+      field.Should().Be(DegreeOfPrecisionComponent.PresentButNull);
    }
 
    [Fact]
-   public void SequenceIDField_Parse_ShouldLogFieldPresentButNull_WhenFieldIsTwoDoubleQuotes()
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogFieldPresentButNull_WhenFieldIsTwoDoubleQuotes()
    {
       // Arrange.
-      var line = "TST|\"\"|This is a test..".AsSpan();
-      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      var line = $"20230608192021.2234^\"\"".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
@@ -527,7 +453,7 @@ public class SequenceIdFieldTests
          GeneralConstants.PresentButNullValue);
 
       // Act.
-      _ = SequenceIDField.Parse(
+      _ = DegreeOfPrecisionComponent.Parse(
          ref fieldEnumerator,
          _fieldSpecification,
          _lineNumber,

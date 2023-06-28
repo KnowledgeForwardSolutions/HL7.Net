@@ -69,7 +69,7 @@ public class MessageHeaderSegment : ISegment
    /// <summary>
    ///   The date/time that the sending system created the message.
    /// </summary>
-   public StringField DateTimeOfMessage { get; private set; } = default!;
+   public TimestampField DateTimeOfMessage { get; private set; } = default!;
 
    /// <summary>
    ///   Used to implement security features.
@@ -129,7 +129,7 @@ public class MessageHeaderSegment : ISegment
 
    internal static MessageHeaderSegment Parse(
       ReadOnlySpan<Char> segmentText,
-      ref EncodingDetails encodingDetails,
+      TimeSpan defaultTimezoneOffset,
       Int32 lineNumber,
       ProcessingLog log)
    {
@@ -154,7 +154,7 @@ public class MessageHeaderSegment : ISegment
          lineNumber,
          log);
 
-      encodingDetails = new EncodingDetails(
+      var encodingDetails = new EncodingDetails(
          segment.FieldSeparator,
          segment.EncodingCharacters.ComponentSeparator,
          segment.EncodingCharacters.RepetitionSeparator,
@@ -189,10 +189,11 @@ public class MessageHeaderSegment : ISegment
          lineNumber,
          log);
 
-      segment.DateTimeOfMessage = StringField.Parse(
+      segment.DateTimeOfMessage = TimestampField.Parse(
          ref fieldEnumerator,
          encodingDetails,
          _fieldSpecifications[6],
+         defaultTimezoneOffset,
          lineNumber,
          log);
 

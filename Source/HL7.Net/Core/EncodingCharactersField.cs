@@ -33,7 +33,7 @@ public sealed record EncodingCharactersField
    ///   Identifies if this field is present in the message and if the value of
    ///   the field is null or not.
    /// </summary>
-   public FieldPresence FieldPresence => FieldPresence.Present;
+   public Presence FieldPresence => Presence.Present;
 
    /// <inheritdoc/>
    public Optionality Optionality => Optionality.Required;
