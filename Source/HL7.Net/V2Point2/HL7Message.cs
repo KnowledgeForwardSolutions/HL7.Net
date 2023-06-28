@@ -41,6 +41,7 @@ public sealed class HL7Message : IHL7Message
                SegmentIDs.EventTypeSegment => EventTypeSegment.Parse(
                   line,
                   encodingDetails,
+                  defaultTimezoneOffset,
                   lineNumber, 
                   log),
                SegmentIDs.MessageHeaderSegment => MessageHeaderSegment.Parse(
@@ -56,11 +57,13 @@ public sealed class HL7Message : IHL7Message
                SegmentIDs.PatientIdentificationSegment => PatientIdentificationSegment.Parse(
                   line,
                   encodingDetails,
+                  defaultTimezoneOffset,
                   lineNumber,
                   log),
                SegmentIDs.PatientVisitSegment => PatientVisitSegment.Parse(
                   line,
                   encodingDetails,
+                  defaultTimezoneOffset,
                   lineNumber,
                   log),
                _ => UnrecognizedSegment(log, lineNumber, line.ToString())

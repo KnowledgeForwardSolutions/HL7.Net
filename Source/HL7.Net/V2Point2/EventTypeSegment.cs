@@ -29,12 +29,12 @@ public class EventTypeSegment : ISegment
    ///   The date/time of the trigger event that caused this message to be 
    ///   created.
    /// </summary>
-   public StringField DateTimeOfEvent { get; private set; } = default!;
+   public TimestampField DateTimeOfEvent { get; private set; } = default!;
 
    /// <summary>
    ///   The date/time that the event is planned.
    /// </summary>
-   public StringField DateTimePlannedEvent { get; private set; } = default!;
+   public TimestampField DateTimePlannedEvent { get; private set; } = default!;
 
    /// <summary>
    ///   Describes the reason for this event.
@@ -49,6 +49,7 @@ public class EventTypeSegment : ISegment
    internal static EventTypeSegment Parse(
       ReadOnlySpan<Char> segmentText,
       EncodingDetails encodingDetails,
+      TimeSpan defaultTimezoneOffset,
       Int32 lineNumber,
       ProcessingLog log)
    {
@@ -68,17 +69,19 @@ public class EventTypeSegment : ISegment
          lineNumber,
          log);
 
-      segment.DateTimeOfEvent = StringField.Parse(
+      segment.DateTimeOfEvent = TimestampField.Parse(
          ref fieldEnumerator,
          encodingDetails,
          _fieldSpecifications[1],
+         defaultTimezoneOffset,
          lineNumber,
          log);
 
-      segment.DateTimePlannedEvent = StringField.Parse(
+      segment.DateTimePlannedEvent = TimestampField.Parse(
          ref fieldEnumerator,
          encodingDetails,
          _fieldSpecifications[2],
+         defaultTimezoneOffset,
          lineNumber,
          log);
 

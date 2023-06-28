@@ -81,7 +81,7 @@ public class PatientIdentificationSegment : ISegment
    /// <summary>
    ///   Patient's date of birth.
    /// </summary>
-   public StringField DateOfBirth { get; private set; } = default!;
+   public TimestampField DateOfBirth { get; private set; } = default!;
 
    /// <summary>
    ///   Patient's sex.
@@ -189,6 +189,7 @@ public class PatientIdentificationSegment : ISegment
    internal static PatientIdentificationSegment Parse(
       ReadOnlySpan<Char> segmentText,
       EncodingDetails encodingDetails,
+      TimeSpan defaultTimezoneOffset,
       Int32 lineNumber,
       ProcessingLog log)
    {
@@ -242,10 +243,11 @@ public class PatientIdentificationSegment : ISegment
          lineNumber,
          log);
 
-      segment.DateOfBirth = StringField.Parse(
+      segment.DateOfBirth = TimestampField.Parse(
          ref fieldEnumerator,
          encodingDetails,
          _fieldSpecifications[6],
+         defaultTimezoneOffset,
          lineNumber,
          log);
 
