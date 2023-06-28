@@ -8,7 +8,7 @@ public sealed record FieldSeparatorField
    internal FieldSeparatorField(
       Char value, 
       String? rawValue,
-      FieldPresence fieldPresence = FieldPresence.Present)
+      Presence fieldPresence = Presence.Present)
    {
       Value = value;
       RawValue = rawValue;
@@ -21,7 +21,7 @@ public sealed record FieldSeparatorField
    ///   Identifies if this field is present in the message and if the value of
    ///   the field is null or not.
    /// </summary>
-   public FieldPresence FieldPresence { get; init; }
+   public Presence FieldPresence { get; init; }
 
    /// <summary>
    ///   The raw text value for this field that was read from an HL7 message.
@@ -47,7 +47,7 @@ public sealed record FieldSeparatorField
             $"Missing required field - {fieldSpecification.FieldName}",
             lineNumber,
             fieldSpecification);
-         return new FieldSeparatorField('\0', null, FieldPresence.NotPresent);
+         return new FieldSeparatorField('\0', null, Presence.NotPresent);
       }
 
       var fieldSeparator = span[3];

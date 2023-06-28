@@ -4,33 +4,30 @@
 ///   A field containing an integer sequence id. Implements HL7 V2.2 spec 
 ///   section 2.8.10.12.
 /// </summary>
-public sealed record SequenceIDField
+public sealed record SequenceIDField : IPresence
 {
    /// <summary>
    ///   Represents a sequence id field that is not present.
    /// </summary>
-   public static readonly SequenceIDField NotPresent = new(null, FieldPresence.NotPresent);
+   public static readonly SequenceIDField NotPresent = new(null, Presence.NotPresent);
 
    /// <summary>
    ///   Represents a sequence id field that is present but is null.
    /// </summary>
-   public static readonly SequenceIDField PresentButNull = new(null, FieldPresence.PresentButNull);
+   public static readonly SequenceIDField PresentButNull = new(null, Presence.PresentButNull);
 
    internal SequenceIDField(
       Int32? value,
-      FieldPresence fieldPresence = FieldPresence.Present)
+      Presence fieldPresence = Presence.Present)
    {
       Value = value;
-      FieldPresence = fieldPresence;
+      Presence = fieldPresence;
    }
 
    public static implicit operator Int32?(SequenceIDField field) => field.Value;
 
-   /// <summary>
-   ///   Identifies if this field is present in the message and if the value of
-   ///   the field is null or not.
-   /// </summary>
-   public FieldPresence FieldPresence { get; init; }
+   /// <inheritdoc/>
+   public Presence Presence { get; init; }
 
    /// <summary>
    ///   The value of this field.

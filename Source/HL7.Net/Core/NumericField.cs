@@ -3,33 +3,30 @@
 /// <summary>
 ///   A field containing numeric data. Implements HL7 V2.2 spec section 2.8.10.4.
 /// </summary>
-public sealed record NumericField
+public sealed record NumericField : IPresence
 {
    /// <summary>
    ///   Represents a numeric field that is not present.
    /// </summary>
-   public static readonly NumericField NotPresent = new(null, FieldPresence.NotPresent);
+   public static readonly NumericField NotPresent = new(null, Presence.NotPresent);
 
    /// <summary>
    ///   Represents a numeric field that is present but is null.
    /// </summary>
-   public static readonly NumericField PresentButNull = new(null, FieldPresence.PresentButNull);
+   public static readonly NumericField PresentButNull = new(null, Presence.PresentButNull);
 
    internal NumericField(
       Decimal? value,
-      FieldPresence fieldPresence = FieldPresence.Present)
+      Presence fieldPresence = Presence.Present)
    {
       Value = value;
-      FieldPresence = fieldPresence;
+      Presence = fieldPresence;
    }
 
    public static implicit operator Decimal?(NumericField field) => field.Value;
 
-   /// <summary>
-   ///   Identifies if this field is present in the message and if the value of
-   ///   the field is null or not.
-   /// </summary>
-   public FieldPresence FieldPresence { get; init; }
+   /// <inheritdoc/>
+   public Presence Presence { get; init; }
 
    /// <summary>
    ///   The value of this field.

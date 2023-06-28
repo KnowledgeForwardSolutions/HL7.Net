@@ -29,7 +29,7 @@ public class DateTimeComponentTests
       // Assert.
       sut.Should().NotBeNull();
       sut.Value.Should().Be(value);
-      sut.FieldPresence.Should().Be(FieldPresence.Present);
+      sut.Presence.Should().Be(Presence.Present);
    }
 
    [Fact]
@@ -38,12 +38,12 @@ public class DateTimeComponentTests
       DateTimeOffset? value = null!;
 
       // Act.
-      var sut = new DateTimeComponent(value, FieldPresence.NotPresent);
+      var sut = new DateTimeComponent(value, Presence.NotPresent);
 
       // Assert.
       sut.Should().NotBeNull();
       sut.Value.Should().Be(value);
-      sut.FieldPresence.Should().Be(FieldPresence.NotPresent);
+      sut.Presence.Should().Be(Presence.NotPresent);
    }
 
    #endregion
@@ -81,7 +81,7 @@ public class DateTimeComponentTests
 
    #endregion
 
-   #region NotPresent Property Tests
+   #region NotPresent Instance Tests
    // ==========================================================================
    // ==========================================================================
 
@@ -94,12 +94,12 @@ public class DateTimeComponentTests
       // Assert.
       sut.Should().NotBeNull();
       sut.Value.Should().BeNull();
-      sut.FieldPresence.Should().Be(FieldPresence.NotPresent);
+      sut.Presence.Should().Be(Presence.NotPresent);
    }
 
    #endregion
 
-   #region PresentButNull Property Tests
+   #region PresentButNull Instance Tests
    // ==========================================================================
    // ==========================================================================
 
@@ -112,7 +112,7 @@ public class DateTimeComponentTests
       // Assert.
       sut.Should().NotBeNull();
       sut.Value.Should().BeNull();
-      sut.FieldPresence.Should().Be(FieldPresence.PresentButNull);
+      sut.Presence.Should().Be(Presence.PresentButNull);
    }
 
    #endregion

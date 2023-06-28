@@ -4,33 +4,30 @@
 ///   Degree of precision component of a timestamp field. Implements HL7 V2.2 
 ///   spec section 2.8.10.7.
 /// </summary>
-public record DegreeOfPrecisionComponent
+public record DegreeOfPrecisionComponent : IPresence
 {
    /// <summary>
    ///   Represents a degree of precision component that is not present.
    /// </summary>
-   public static readonly DegreeOfPrecisionComponent NotPresent = new(null, FieldPresence.NotPresent);
+   public static readonly DegreeOfPrecisionComponent NotPresent = new(null, Presence.NotPresent);
 
    /// <summary>
    ///   Represents a degree of precision component that is present but is null.
    /// </summary>
-   public static readonly DegreeOfPrecisionComponent PresentButNull = new(null, FieldPresence.PresentButNull);
+   public static readonly DegreeOfPrecisionComponent PresentButNull = new(null, Presence.PresentButNull);
 
    internal DegreeOfPrecisionComponent(
       Char? value,
-      FieldPresence fieldPresence = FieldPresence.Present)
+      Presence fieldPresence = Presence.Present)
    {
       Value = value;
-      FieldPresence = fieldPresence;
+      Presence = fieldPresence;
    }
 
    public static implicit operator Char?(DegreeOfPrecisionComponent field) => field.Value;
 
-   /// <summary>
-   ///   Identifies if this field is present in the message and if the value of
-   ///   the field is null or not.
-   /// </summary>
-   public FieldPresence FieldPresence { get; init; }
+   /// <inheritdoc/>
+   public Presence Presence { get; init; }
 
    /// <summary>
    ///   The value of this component.

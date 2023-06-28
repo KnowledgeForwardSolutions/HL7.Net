@@ -4,7 +4,7 @@
 ///   Date/time component of a timestamp field. Implements HL7 V2.2 spec section
 ///   2.8.10.7.
 /// </summary>
-public sealed record DateTimeComponent
+public sealed record DateTimeComponent : IPresence
 {
    private static readonly String[] AcceptedFormats = 
    {
@@ -17,28 +17,25 @@ public sealed record DateTimeComponent
    /// <summary>
    ///   Represents a date/time component that is not present.
    /// </summary>
-   public static readonly DateTimeComponent NotPresent = new(null, FieldPresence.NotPresent);
+   public static readonly DateTimeComponent NotPresent = new(null, Presence.NotPresent);
 
    /// <summary>
    ///   Represents a date/time component that is present but is null.
    /// </summary>
-   public static readonly DateTimeComponent PresentButNull = new(null, FieldPresence.PresentButNull);
+   public static readonly DateTimeComponent PresentButNull = new(null, Presence.PresentButNull);
 
    internal DateTimeComponent(
       DateTimeOffset? value,
-      FieldPresence fieldPresence = FieldPresence.Present)
+      Presence fieldPresence = Presence.Present)
    {
       Value = value;
-      FieldPresence = fieldPresence;
+      Presence = fieldPresence;
    }
 
    public static implicit operator DateTimeOffset?(DateTimeComponent field) => field.Value;
 
-   /// <summary>
-   ///   Identifies if this field is present in the message and if the value of
-   ///   the field is null or not.
-   /// </summary>
-   public FieldPresence FieldPresence { get; init; }
+   /// <inheritdoc/>
+   public Presence Presence { get; init; }
 
    /// <summary>
    ///   The value of this component.

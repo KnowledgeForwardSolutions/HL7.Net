@@ -11,9 +11,13 @@ public class HL7MessageTests
    {
       // Arrange.
       var messageText = TestMessages.AdmitPatient;
+      var defaultTimezoneOffset = new TimeSpan(1, 0, 0);
 
       // Act.
-      var message = HL7Message.Parse(messageText.AsSpan(), out var log);
+      var message = HL7Message.Parse(
+         messageText.AsSpan(),
+         defaultTimezoneOffset,
+         out var log);
 
       // Assert.
       message.Should().NotBeNull();
