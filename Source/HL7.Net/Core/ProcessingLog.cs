@@ -27,60 +27,53 @@ public class ProcessingLog : IEnumerable<LogEntry>
    /// </summary>
    public IEnumerator<LogEntry> GetEnumerator() => _logs.GetEnumerator();
 
+   internal void AddLogEntry(LogEntry entry)
+   {
+      _logs.Add(entry);
+      if (HighestLogLevel < entry.LogLevel)
+      {
+         HighestLogLevel = entry.LogLevel;
+      }
+   }
+
    internal void LogError(
       String message,
       Int32 lineNumber,
       FieldSpecification? fieldSpecification = null,
       String? rawData = null)
-   {
-      _logs.Add(new LogEntry(LogLevel.Error, message, lineNumber, fieldSpecification?.FieldDescription, rawData));
-      if (HighestLogLevel < LogLevel.Error)
-      {
-         HighestLogLevel = LogLevel.Error;
-      }
-   }
+      => AddLogEntry(new LogEntry(LogLevel.Error, message, lineNumber, fieldSpecification?.FieldDescription, rawData));
 
    internal void LogFatalError(
       String message,
       Int32 lineNumber,
       FieldSpecification? fieldSpecification = null,
       String? rawData = null)
-   {
-      _logs.Add(new LogEntry(LogLevel.FatalError, message, lineNumber, fieldSpecification?.FieldDescription, rawData));
-      if (HighestLogLevel < LogLevel.FatalError)
-      {
-         HighestLogLevel = LogLevel.FatalError;
-      }
-   }
+      => AddLogEntry(new LogEntry(LogLevel.FatalError, message, lineNumber, fieldSpecification?.FieldDescription, rawData));
 
    internal void LogFieldNotPresent(Int32 lineNumber, FieldSpecification fieldSpecification)
    {
-      String message;
       if (fieldSpecification.Optionality == Optionality.Required)
       {
-         message = String.Format(Messages.LogRequiredFieldNotPresent, fieldSpecification.FieldDescription);
-         LogError(message, lineNumber, fieldSpecification);
+         AddLogEntry(LogEntry.GetRequiredFieldNotPresentEntry(lineNumber, fieldSpecification.FieldDescription));
          return;
       }
 
-      message = String.Format(Messages.LogFieldNotPresent, fieldSpecification.FieldDescription);
-      LogInformation(message, lineNumber, fieldSpecification);
+      AddLogEntry(LogEntry.GetOptionalFieldNotPresentEntry(lineNumber, fieldSpecification.FieldDescription));
    }
 
    internal void LogFieldPresent(
       Int32 lineNumber,
       FieldSpecification fieldSpecification,
       ReadOnlySpan<Char> fieldContents)
-   {
-      var message = String.Format(Messages.LogFieldPresent, fieldSpecification.FieldDescription);
-      LogInformation(message, lineNumber, fieldSpecification, fieldContents.ToString());
-   }
+      => AddLogEntry(LogEntry.GetFieldPresentEntry(
+         lineNumber, 
+         fieldSpecification.FieldDescription,
+         fieldContents.ToString()));
 
    internal void LogFieldPresentButNull(Int32 lineNumber, FieldSpecification fieldSpecification)
-   {
-      var message = String.Format(Messages.LogFieldPresentButNull, fieldSpecification.FieldDescription);
-      LogInformation(message, lineNumber, fieldSpecification, "\"\"");
-   }
+      => AddLogEntry(LogEntry.GetFieldPresentButNullEntry(
+         lineNumber,
+         fieldSpecification.FieldDescription));
 
    internal void LogFieldPresentButPossiblyTruncated(
       Int32 lineNumber,
@@ -117,13 +110,7 @@ public class ProcessingLog : IEnumerable<LogEntry>
       Int32 lineNumber,
       FieldSpecification? fieldSpecification = null,
       String? rawData = null)
-   {
-      _logs.Add(new LogEntry(LogLevel.Warning, message, lineNumber, fieldSpecification?.FieldDescription, rawData));
-      if (HighestLogLevel < LogLevel.Warning)
-      {
-         HighestLogLevel = LogLevel.Warning;
-      }
-   }
+      => AddLogEntry(new LogEntry(LogLevel.Warning, message, lineNumber, fieldSpecification?.FieldDescription, rawData));
 
    IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
 }
