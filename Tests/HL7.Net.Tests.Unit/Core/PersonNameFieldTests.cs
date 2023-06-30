@@ -1,33 +1,43 @@
 ﻿namespace HL7.Net.Tests.Unit.Core;
 
-public class TimestampFieldTests
+public class PersonNameFieldTests
 {
    private static readonly EncodingDetails _encodingDetails = EncodingDetails.DefaultEncodingDetails;
    private static readonly FieldSpecification _fieldSpecification = new(
-      "MSH",
+      "PID",
       1,
-      "Date / Time Of Message",
-      26,
-      HL7Datatype.TS_Timestamp,
+      "PatientName",
+      48,
+      HL7Datatype.PN_PersonName,
       Optionality.Required,
       "N");
-   private static readonly TimeSpan _defaultTimezoneOffset = new TimeSpan(-1, 0, 0);
    private const Int32 _lineNumber = 10;
+
+   private const String _familyName = "Smith";
+   private const String _givenName = "John";
+   private const String _middleName = "J";
+   private const String _suffix = "III";
+   private const String _prefix = "DR";
+   private const String _degree = "PHD";
 
    #region NotPresent Instance Tests
    // ==========================================================================
    // ==========================================================================
 
    [Fact]
-   public void TimestampField_NotPresent_ShouldReturnExpectedValue()
+   public void PersonNameField_NotPresent_ShouldReturnExpectedValue()
    {
       // Act.
-      var sut = TimestampField.NotPresent;
+      var sut = PersonNameField.NotPresent;
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Timestamp.Should().Be(DateTimeComponent.NotPresent);
-      sut.DegreeOfPrecision.Should().Be(DegreeOfPrecisionComponent.NotPresent);
+      sut.FamilyName.Should().Be(StringField.NotPresent);
+      sut.GivenName.Should().Be(StringField.NotPresent);
+      sut.MiddleNameOrInitial.Should().Be(StringField.NotPresent);
+      sut.Suffix.Should().Be(StringField.NotPresent);
+      sut.Prefix.Should().Be(StringField.NotPresent);
+      sut.Degree.Should().Be(StringField.NotPresent);
       sut.Presence.Should().Be(Presence.NotPresent);
    }
 
@@ -38,15 +48,19 @@ public class TimestampFieldTests
    // ==========================================================================
 
    [Fact]
-   public void TimestampField_PresentButNull_ShouldReturnExpectedValue()
+   public void PersonNameField_PresentButNull_ShouldReturnExpectedValue()
    {
       // Act.
-      var sut = TimestampField.PresentButNull;
+      var sut = PersonNameField.PresentButNull;
 
       // Assert.
       sut.Should().NotBeNull();
-      sut.Timestamp.Should().Be(DateTimeComponent.NotPresent);
-      sut.DegreeOfPrecision.Should().Be(DegreeOfPrecisionComponent.NotPresent);
+      sut.FamilyName.Should().Be(StringField.NotPresent);
+      sut.GivenName.Should().Be(StringField.NotPresent);
+      sut.MiddleNameOrInitial.Should().Be(StringField.NotPresent);
+      sut.Suffix.Should().Be(StringField.NotPresent);
+      sut.Prefix.Should().Be(StringField.NotPresent);
+      sut.Degree.Should().Be(StringField.NotPresent);
       sut.Presence.Should().Be(Presence.PresentButNull);
    }
 
@@ -57,57 +71,53 @@ public class TimestampFieldTests
    // ==========================================================================
 
    [Fact]
-   public void TimestampField_Parse_ShouldReturnExpectedValue_WhenAllComponentsSupplied()
+   public void PersonNameField_Parse_ShouldReturnExpectedValue_WhenAllComponentsSupplied()
    {
       // Arrange.
-      var fieldContents = "198808181126^D";
-      var line = $"MSH|{fieldContents}|asdf".AsSpan();
+      var line = $"PID|{_familyName}^{_givenName}^{_middleName}^{_suffix}^{_prefix}^{_degree}|asdf".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      var expectedTimestamp = new DateTimeComponent(new DateTimeOffset(1988, 8, 18, 11, 26, 0, _defaultTimezoneOffset));
-      var expectedDegreeOfPrecision = new DegreeOfPrecisionComponent('D');
-      var expectedFieldPresence = Presence.Present;
-
       // Act.
-      var field = TimestampField.Parse(
+      var field = PersonNameField.Parse(
          ref fieldEnumerator,
          _encodingDetails,
          _fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().NotBeNull(); 
+      field.Should().NotBeNull();
 
-      field.Timestamp.Should().Be(expectedTimestamp);
-      field.DegreeOfPrecision.Should().Be(expectedDegreeOfPrecision);   
-      field.Presence.Should().Be(expectedFieldPresence);
+      field.FamilyName.Value.Should().Be(_familyName);
+      field.GivenName.Value.Should().Be(_givenName);
+      field.MiddleNameOrInitial.Value.Should().Be(_middleName);
+      field.Suffix.Value.Should().Be(_suffix);
+      field.Prefix.Value.Should().Be(_prefix);
+      field.Degree.Value.Should().Be(_degree);
    }
 
    [Fact]
-   public void TimestampField_Parse_ShouldLogExpectedEntry_WhenAllComponentsSupplied()
+   public void PersonNameField_Parse_ShouldLogExpectedEntry_WhenAllComponentsSupplied()
    {
       // Arrange.
-      var fieldContents = "198808181126^D";
-      var line = $"MSH|{fieldContents}|asdf".AsSpan();
+      var fieldContents = $"{_familyName}^{_givenName}^{_middleName}^{_suffix}^{_prefix}^{_degree}";
+      var line = $"PID|{fieldContents}|asdf".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
       var expectedLogEntry = LogEntry.GetFieldPresentEntry(
          _lineNumber,
-         _fieldSpecification.FieldDescription,
+         _fieldSpecification.FieldDescription, 
          fieldContents);
 
       // Act.
-      _ = TimestampField.Parse(
+      _ = PersonNameField.Parse(
          ref fieldEnumerator,
          _encodingDetails,
          _fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -116,78 +126,127 @@ public class TimestampFieldTests
    }
 
    [Fact]
-   public void TimestampField_Parse_ShouldReturnExpectedValue_WhenDegreeOfPrecisionIsNotSupplied()
+   public void PersonNameField_Parse_ShouldReturnExpectedValue_WhenSubsetOfComponentsSupplied()
    {
       // Arrange.
-      var line = "MSH|198808181126|asdf".AsSpan();
+      var line = $"PID|{_familyName}^{_givenName}^^^{_prefix}|asdf".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      var expectedTimestamp = new DateTimeComponent(new DateTimeOffset(1988, 8, 18, 11, 26, 0, _defaultTimezoneOffset));
-      var expectedDegreeOfPrecision = DegreeOfPrecisionComponent.NotPresent;
-      var expectedFieldPresence = Presence.Present;
-
       // Act.
-      var field = TimestampField.Parse(
+      var field = PersonNameField.Parse(
          ref fieldEnumerator,
          _encodingDetails,
          _fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
       // Assert.
       field.Should().NotBeNull();
 
-      field.Timestamp.Should().Be(expectedTimestamp);
-      field.DegreeOfPrecision.Should().Be(expectedDegreeOfPrecision);
-      field.Presence.Should().Be(expectedFieldPresence);
+      field.FamilyName.Value.Should().Be(_familyName);
+      field.GivenName.Value.Should().Be(_givenName);
+      field.MiddleNameOrInitial.Presence.Should().Be(Presence.NotPresent);
+      field.Suffix.Presence.Should().Be(Presence.NotPresent);
+      field.Prefix.Value.Should().Be(_prefix);
+      field.Degree.Presence.Should().Be(Presence.NotPresent);
    }
 
    [Fact]
-   public void TimestampField_Parse_ShouldReportMissingRequiredField_WhenTimestampIsNotSupplied()
+   public void PersonNameField_Parse_ShouldReturnExpectedValue_WhenFieldContentsExceedFieldLength()
    {
       // Arrange.
-      var line = "MSH|^H|asdf".AsSpan();
+      var fieldContents = "12345678901234567890^12345678901234567890^^1234567890^12345^12345";
+      var line = $"PID|{fieldContents}|asdf".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      var expectedTimestamp = DateTimeComponent.NotPresent;
-      var expectedDegreeOfPrecision = new DegreeOfPrecisionComponent('H');
-      var expectedFieldPresence = Presence.Present;
-
-      var message = String.Format(Messages.LogRequiredFieldNotPresent, "TS.1/DateTime");
-      var expectedLogEntry = new LogEntry(LogLevel.Error, message, _lineNumber, "TS.1/DateTime");
-
       // Act.
-      var field = TimestampField.Parse(
+      var field = PersonNameField.Parse(
          ref fieldEnumerator,
          _encodingDetails,
          _fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
       // Assert.
       field.Should().NotBeNull();
 
-      field.Timestamp.Should().Be(expectedTimestamp);
-      field.DegreeOfPrecision.Should().Be(expectedDegreeOfPrecision);
-      field.Presence.Should().Be(expectedFieldPresence);
+      field.FamilyName.Value.Should().Be("12345678901234567890");
+      field.GivenName.Value.Should().Be("12345678901234567890");
+      field.MiddleNameOrInitial.Presence.Should().Be(Presence.NotPresent);
+      field.Suffix.Value.Should().Be("12345");
+      field.Prefix.Presence.Should().Be(Presence.NotPresent);
+      field.Degree.Presence.Should().Be(Presence.NotPresent);
+   }
 
-      log.HighestLogLevel.Should().Be(LogLevel.Error);
+   [Fact]
+   public void PersonNameField_Parse_ShouldLogFieldTruncated_WhenFieldContentsExceedFieldLength()
+   {
+      // Arrange.
+      var fieldContents = "12345678901234567890^12345678901234567890^^1234567890^12345^12345";
+      var line = $"PID|{fieldContents}|asdf".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+
+      var expectedLogEntry = LogEntry.GetFieldPresentButTruncatedEntry(
+         _lineNumber,
+         _fieldSpecification.FieldDescription,
+         _fieldSpecification.Length,
+         fieldContents.AsSpan());
+
+      // Act.
+      _ = PersonNameField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         _fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
       log.Should().Contain(expectedLogEntry);
+   }
+
+   [Fact]
+   public void PersonNameField_Parse_ShouldCorrectlyHandleEscapedComponentSeparatorCharacters()
+   {
+      // Arrange.
+      var encodingDetails = _encodingDetails with { ComponentSeparator = '\'' };
+      var fieldContents = $"O\\'{_familyName}'{_givenName}'''{_prefix}".AsSpan();
+      var line = $"PID|{fieldContents}|asdf".AsSpan();
+      var fieldEnumerator = line.ToFields(encodingDetails.FieldSeparator, encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+
+      // Act.
+      var field = PersonNameField.Parse(
+         ref fieldEnumerator,
+         encodingDetails,
+         _fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      field.Should().NotBeNull();
+
+      field.FamilyName.Value.Should().Be(@"O'" + _familyName);
+      field.GivenName.Value.Should().Be(_givenName);
+      field.MiddleNameOrInitial.Presence.Should().Be(Presence.NotPresent);
+      field.Suffix.Presence.Should().Be(Presence.NotPresent);
+      field.Prefix.Value.Should().Be(_prefix);
+      field.Degree.Presence.Should().Be(Presence.NotPresent);
    }
 
    [Theory]
    [InlineData(Optionality.Optional)]
    [InlineData(Optionality.Required)]
-   public void TimestampField_Parse_ShouldReturnNotPresentInstance_WhenFieldIsBeyondEndOfSuppliedFields(Optionality optionality)
+   public void PersonNameField_Parse_ShouldReturnNotPresentInstance_WhenFieldIsBeyondEndOfSuppliedFields(Optionality optionality)
    {
       // Arrange.
-      var line = "MSH|asdf".AsSpan();
+      var line = "PID|asdf".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       fieldEnumerator.MoveNext();
@@ -195,23 +254,22 @@ public class TimestampFieldTests
       var fieldSpecification = _fieldSpecification with { Optionality = optionality, Sequence = 2 };
 
       // Act.
-      var field = TimestampField.Parse(
+      var field = PersonNameField.Parse(
          ref fieldEnumerator,
          _encodingDetails,
          fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(TimestampField.NotPresent);
+      field.Should().Be(PersonNameField.NotPresent);
    }
 
    [Fact]
-   public void TimestampField_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsBeyondEndOfSuppliedFields()
+   public void PersonNameField_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsBeyondEndOfSuppliedFields()
    {
       // Arrange.
-      var line = "MSH|asdf".AsSpan();
+      var line = "PID|asdf".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       fieldEnumerator.MoveNext();
@@ -220,14 +278,13 @@ public class TimestampFieldTests
 
       var expectedLogEntry = LogEntry.GetOptionalFieldNotPresentEntry(
          _lineNumber,
-         _fieldSpecification.FieldDescription);
+         fieldSpecification.FieldDescription);
 
       // Act.
-      _ = TimestampField.Parse(
+      _ = PersonNameField.Parse(
          ref fieldEnumerator,
          _encodingDetails,
          fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -237,10 +294,10 @@ public class TimestampFieldTests
    }
 
    [Fact]
-   public void TimestampField_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsBeyondEndOfSuppliedFields()
+   public void PersonNameField_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsBeyondEndOfSuppliedFields()
    {
       // Arrange.
-      var line = "MSH|asdf".AsSpan();
+      var line = "PID|asdf".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       fieldEnumerator.MoveNext();
@@ -252,11 +309,10 @@ public class TimestampFieldTests
          fieldSpecification.FieldDescription);
 
       // Act.
-      _ = TimestampField.Parse(
+      _ = PersonNameField.Parse(
          ref fieldEnumerator,
          _encodingDetails,
          fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -268,33 +324,32 @@ public class TimestampFieldTests
    [Theory]
    [InlineData(Optionality.Optional)]
    [InlineData(Optionality.Required)]
-   public void TimestampField_Parse_ShouldReturnNotPresentInstance_WhenFieldIsEmpty(Optionality optionality)
+   public void PersonNameField_Parse_ShouldReturnNotPresentInstance_WhenFieldIsEmpty(Optionality optionality)
    {
       // Arrange.
-      var line = "MSH||asdf".AsSpan();
+      var line = "PID||asdf".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
       var fieldSpecification = _fieldSpecification with { Optionality = optionality };
 
       // Act.
-      var field = TimestampField.Parse(
+      var field = PersonNameField.Parse(
          ref fieldEnumerator,
          _encodingDetails,
          fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(TimestampField.NotPresent);
+      field.Should().Be(PersonNameField.NotPresent);
    }
 
    [Fact]
-   public void TimestampField_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsEmpty()
+   public void PersonNameField_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsEmpty()
    {
       // Arrange.
-      var line = "MSH||asdf".AsSpan();
+      var line = "PID||asdf".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
@@ -305,11 +360,10 @@ public class TimestampFieldTests
          fieldSpecification.FieldDescription);
 
       // Act.
-      _ = TimestampField.Parse(
+      _ = PersonNameField.Parse(
          ref fieldEnumerator,
          _encodingDetails,
          fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -319,10 +373,10 @@ public class TimestampFieldTests
    }
 
    [Fact]
-   public void TimestampField_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsEmpty()
+   public void PersonNameField_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsEmpty()
    {
       // Arrange.
-      var line = "MSH||asdf".AsSpan();
+      var line = "PID||asdf".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
@@ -333,11 +387,10 @@ public class TimestampFieldTests
          fieldSpecification.FieldDescription);
 
       // Act.
-      _ = TimestampField.Parse(
+      _ = PersonNameField.Parse(
          ref fieldEnumerator,
          _encodingDetails,
          fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -347,32 +400,31 @@ public class TimestampFieldTests
    }
 
    [Fact]
-   public void TimestampField_Parse_ShouldReturnPresentButNullInstance_WhenFieldIsTwoDoubleQuotes()
+   public void PersonNameField_Parse_ShouldReturnPresentButNullInstance_WhenFieldIsTwoDoubleQuotes()
    {
       // Arrange.
-      var line = "MSH|\"\"|asdf".AsSpan();
+      var line = "PID|\"\"|asdf".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
       // Act.
-      var field = TimestampField.Parse(
+      var field = PersonNameField.Parse(
          ref fieldEnumerator,
          _encodingDetails,
          _fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
       // Assert.
-      field.Should().Be(TimestampField.PresentButNull);
+      field.Should().Be(PersonNameField.PresentButNull);
    }
 
    [Fact]
-   public void TimestampField_Parse_ShouldLogFieldPresentButNull_WhenFieldIsTwoDoubleQuotes()
+   public void PersonNameField_Parse_ShouldLogFieldPresentButNull_WhenFieldIsTwoDoubleQuotes()
    {
       // Arrange.
-      var line = "MSH|\"\"|asdf".AsSpan();
+      var line = "PID|\"\"|asdf".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
@@ -382,11 +434,10 @@ public class TimestampFieldTests
          _fieldSpecification.FieldDescription);
 
       // Act.
-      _ = TimestampField.Parse(
+      _ = PersonNameField.Parse(
          ref fieldEnumerator,
          _encodingDetails,
          _fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 
@@ -396,11 +447,11 @@ public class TimestampFieldTests
    }
 
    [Fact]
-   public void TimestampField_Parse_ShouldLogExpectedWarning_WhenAdditionalComponentsSupplied()
+   public void PersonNameField_Parse_ShouldLogExpectedWarning_WhenAdditionalComponentsSupplied()
    {
       // Arrange.
-      var fieldContents = "198808181126^D^^1234";
-      var line = $"MSH|{fieldContents}|asdf".AsSpan();
+      var fieldContents = $"{_familyName}^{_givenName}^^^^{_degree}^Half-orc^Ninja Assassin";
+      var line = $"PID|{fieldContents}|asdf".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
@@ -412,11 +463,10 @@ public class TimestampFieldTests
          _fieldSpecification.FieldDescription);
 
       // Act.
-      _ = TimestampField.Parse(
+      _ = PersonNameField.Parse(
          ref fieldEnumerator,
          _encodingDetails,
          _fieldSpecification,
-         _defaultTimezoneOffset,
          _lineNumber,
          log);
 

@@ -13,6 +13,7 @@ public sealed record TimestampField : IPresence
       new FieldSpecification("TS", 1, "DateTime", 26, HL7Datatype.DateTimeComponent, Optionality.Required, "N"),
       new FieldSpecification("TS", 2, "DegreeOfPrecision", 1, HL7Datatype.TimestampDegreeOfPrecisionComponent, Optionality.Optional, "N"),
    };
+
    /// <summary>
    ///   Represents a timestamp field that is not present.
    /// </summary>
@@ -81,11 +82,18 @@ public sealed record TimestampField : IPresence
 
       field.DegreeOfPrecision = DegreeOfPrecisionComponent.Parse(
          ref componentEnumerator,
-         _fieldSpecifications[0],
+         _fieldSpecifications[1],
          lineNumber,
          log);
 
+      if (componentEnumerator.MoveNext())
+      {
+         log.LogWarning(Messages.AdditionalDataIgnored, lineNumber, fieldSpecification);
+      }
+
       field.Presence = Presence.Present;
+
+      log.LogFieldPresent(lineNumber, fieldSpecification, fieldEnumerator.Current);
 
       return field;
    }

@@ -3,30 +3,25 @@
 /// <summary>
 ///   Defines the field separator used in an HL7 message.
 /// </summary>
-public sealed record FieldSeparatorField
+public sealed record FieldSeparatorField : IPresence
 {
+   /// <summary>
+   ///   Represents a field separator field that is not present.
+   /// </summary>
+   public static readonly FieldSeparatorField NotPresent = new('\0', Presence.NotPresent);
+
    internal FieldSeparatorField(
       Char value, 
-      String? rawValue,
       Presence fieldPresence = Presence.Present)
    {
       Value = value;
-      RawValue = rawValue;
-      FieldPresence = fieldPresence;
+      Presence = fieldPresence;
    }
 
    public static implicit operator Char(FieldSeparatorField field) => field.Value;
 
-   /// <summary>
-   ///   Identifies if this field is present in the message and if the value of
-   ///   the field is null or not.
-   /// </summary>
-   public Presence FieldPresence { get; init; }
-
-   /// <summary>
-   ///   The raw text value for this field that was read from an HL7 message.
-   /// </summary>
-   public String? RawValue { get; init; }
+   /// <inheritdoc/>
+   public Presence Presence { get; init; }
 
    /// <summary>
    ///   The value of this field.
@@ -44,15 +39,15 @@ public sealed record FieldSeparatorField
       if (span.Length < 4)
       {
          log.LogFatalError(
-            $"Missing required field - {fieldSpecification.FieldName}",
+            String.Format(Messages.MissingFieldSeparator, fieldSpecification.FieldDescription),
             lineNumber,
             fieldSpecification);
-         return new FieldSeparatorField('\0', null, Presence.NotPresent);
+         return FieldSeparatorField.NotPresent;
       }
 
       var fieldSeparator = span[3];
-      var raw = fieldSeparator.ToString();
+      log.LogFieldPresent(lineNumber, fieldSpecification, span.Slice(3, 1));
       
-      return new FieldSeparatorField(fieldSeparator, raw);
+      return new FieldSeparatorField(fieldSeparator);
    }
 }

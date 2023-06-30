@@ -161,11 +161,7 @@ public class NumericFieldTests
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      var message = String.Format(Messages.LogFieldPresent, _fieldSpecification.FieldDescription);
-
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Information,
-         message,
+      var expectedLogEntry = LogEntry.GetFieldPresentEntry(
          _lineNumber,
          _fieldSpecification.FieldDescription,
          fieldContents);
@@ -345,12 +341,7 @@ public class NumericFieldTests
       var log = new ProcessingLog();
       var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Optional, Sequence = 2 };
 
-      var message = String.Format(
-         Messages.LogFieldNotPresent,
-         fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Information,
-         message,
+      var expectedLogEntry = LogEntry.GetOptionalFieldNotPresentEntry(
          _lineNumber,
          fieldSpecification.FieldDescription);
 
@@ -377,12 +368,7 @@ public class NumericFieldTests
       var log = new ProcessingLog();
       var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Required, Sequence = 2 };
 
-      var message = String.Format(
-         Messages.LogRequiredFieldNotPresent,
-         fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Error,
-         message,
+      var expectedLogEntry = LogEntry.GetRequiredFieldNotPresentEntry(
          _lineNumber,
          fieldSpecification.FieldDescription);
 
@@ -430,12 +416,7 @@ public class NumericFieldTests
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      var message = String.Format(
-         Messages.LogFieldNotPresent,
-         _fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Information,
-         message,
+      var expectedLogEntry = LogEntry.GetOptionalFieldNotPresentEntry(
          _lineNumber,
          _fieldSpecification.FieldDescription);
 
@@ -459,14 +440,9 @@ public class NumericFieldTests
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
-
       var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Required };
-      var message = String.Format(
-         Messages.LogRequiredFieldNotPresent,
-         fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Error,
-         message,
+
+      var expectedLogEntry = LogEntry.GetRequiredFieldNotPresentEntry(
          _lineNumber,
          fieldSpecification.FieldDescription);
 
@@ -511,15 +487,9 @@ public class NumericFieldTests
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      var message = String.Format(
-         Messages.LogFieldPresentButNull,
-         _fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Information,
-         message,
+      var expectedLogEntry = LogEntry.GetFieldPresentButNullEntry(
          _lineNumber,
-         _fieldSpecification.FieldDescription,
-         GeneralConstants.PresentButNullValue);
+         _fieldSpecification.FieldDescription);
 
       // Act.
       _ = NumericField.Parse(

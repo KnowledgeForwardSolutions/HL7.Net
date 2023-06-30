@@ -57,10 +57,11 @@ public sealed record SequenceIDField : IPresence
          : fieldEnumerator.Current;
       if (Int32.TryParse(fieldContents, GeneralConstants.SequenceIdStyle, null, out var value))
       {
-         log.LogFieldPresentButPossiblyTruncated(
+         log.LogFieldPresent(
             lineNumber,
             fieldSpecification,
-            fieldEnumerator.Current);
+            fieldEnumerator.Current,
+            checkTruncated: true);
          return new SequenceIDField(value);
       }
 

@@ -70,7 +70,7 @@ public class PatientIdentificationSegment : ISegment
    /// <summary>
    ///   Patient name.
    /// </summary>
-   public StringField PatientName { get; private set; } = default!;
+   public PersonNameField PatientName { get; private set; } = default!;
 
    /// <summary>
    ///   Family name under which the mother was born (i.e., before marriage.) 
@@ -91,7 +91,7 @@ public class PatientIdentificationSegment : ISegment
    /// <summary>
    ///   Name(s) by which the patient has been known at some time.
    /// </summary>
-   public StringField PatientAlias { get; private set; } = default!;
+   public PersonNameField PatientAlias { get; private set; } = default!;
 
    /// <summary>
    ///   Patient ethnic classification.
@@ -229,7 +229,7 @@ public class PatientIdentificationSegment : ISegment
          lineNumber,
          log);
 
-      segment.PatientName = StringField.Parse(
+      segment.PatientName = PersonNameField.Parse(
          ref fieldEnumerator,
          encodingDetails,
          _fieldSpecifications[4],
@@ -258,7 +258,7 @@ public class PatientIdentificationSegment : ISegment
          lineNumber,
          log);
 
-      segment.PatientAlias = StringField.Parse(
+      segment.PatientAlias = PersonNameField.Parse(
          ref fieldEnumerator,
          encodingDetails,
          _fieldSpecifications[8],

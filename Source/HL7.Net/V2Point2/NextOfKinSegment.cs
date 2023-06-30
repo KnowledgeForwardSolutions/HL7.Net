@@ -33,7 +33,7 @@ public class NextOfKinSegment : ISegment
    /// <summary>
    ///   Name of the next of kin.
    /// </summary>
-   public StringField Name { get; private set; } = default!;
+   public PersonNameField Name { get; private set; } = default!;
 
    /// <summary>
    ///   Defines the actual personal relationship that the next of kin has to 
@@ -118,7 +118,7 @@ public class NextOfKinSegment : ISegment
          lineNumber,
          log);
 
-      segment.Name = StringField.Parse(
+      segment.Name = PersonNameField.Parse(
          ref fieldEnumerator,
          encodingDetails,
          _fieldSpecifications[1],

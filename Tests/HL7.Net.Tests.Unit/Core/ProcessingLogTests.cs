@@ -397,7 +397,30 @@ public class ProcessingLogTests
    // ==========================================================================
 
    [Fact]
-   public void ProcessingLog_LogFieldPresent_ShouldAddExpectedEntry()
+   public void ProcessingLog_LogFieldPresent_ShouldAddExpectedEntry_WhenCheckTruncatedIsDefault()
+   {
+      // Arrange.
+      var sut = new ProcessingLog();
+
+      var message = String.Format(Messages.LogFieldPresent, _fieldSpecification.FieldDescription);
+      var rawData = "this is a test";
+
+      var expectedEntry = new LogEntry(
+         LogLevel.Information,
+         message,
+         _lineNumber,
+         _fieldSpecification.FieldDescription,
+         rawData);
+
+      // Act.
+      sut.LogFieldPresent(_lineNumber, _fieldSpecification, rawData.AsSpan());
+
+      // Assert.
+      sut.First().Should().Be(expectedEntry);
+   }
+
+   [Fact]
+   public void ProcessingLog_LogFieldPresent_ShouldAddExpectedEntry_WhenFieldExceedsMaxLengthAndCheckTruncatedIsDefault()
    {
       // Arrange.
       var sut = new ProcessingLog();
@@ -414,6 +437,55 @@ public class ProcessingLogTests
 
       // Act.
       sut.LogFieldPresent(_lineNumber, _fieldSpecification, rawData.AsSpan());
+
+      // Assert.
+      sut.First().Should().Be(expectedEntry);
+   }
+
+   [Fact]
+   public void ProcessingLog_LogFieldPresent_ShouldAddExpectedEntry_WhenCheckTruncatedIsTrue()
+   {
+      // Arrange.
+      var sut = new ProcessingLog();
+
+      var message = String.Format(Messages.LogFieldPresent, _fieldSpecification.FieldDescription);
+      var rawData = "this is a test";
+
+      var expectedEntry = new LogEntry(
+         LogLevel.Information,
+         message,
+         _lineNumber,
+         _fieldSpecification.FieldDescription,
+         rawData);
+
+      // Act.
+      sut.LogFieldPresent(_lineNumber, _fieldSpecification, rawData.AsSpan(), true);
+
+      // Assert.
+      sut.First().Should().Be(expectedEntry);
+   }
+
+   [Fact]
+   public void ProcessingLog_LogFieldPresent_ShouldAddExpectedEntry_WhenFieldExceedsMaxLengthAndCheckTruncatedIsTrue()
+   {
+      // Arrange.
+      var sut = new ProcessingLog();
+
+      var message = String.Format(
+         Messages.LogFieldPresentButTruncated, 
+         _fieldSpecification.FieldDescription,
+         _fieldSpecification.Length);
+      var rawData = "this is a test...this is only a test...";
+
+      var expectedEntry = new LogEntry(
+         LogLevel.Warning,
+         message,
+         _lineNumber,
+         _fieldSpecification.FieldDescription,
+         rawData);
+
+      // Act.
+      sut.LogFieldPresent(_lineNumber, _fieldSpecification, rawData.AsSpan(), true);
 
       // Assert.
       sut.First().Should().Be(expectedEntry);
@@ -443,63 +515,6 @@ public class ProcessingLogTests
 
       // Act.
       sut.LogFieldPresentButNull(_lineNumber, _fieldSpecification);
-
-      // Assert.
-      sut.First().Should().Be(expectedEntry);
-   }
-
-   #endregion
-
-   #region LogFieldPresentButPossiblyTruncated Method Tests
-   // ==========================================================================
-   // ==========================================================================
-
-   [Fact]
-   public void ProcessingLog_LogFieldPresentButPossiblyTruncated_ShouldAddExpectedEntry_WhenFieldWasNotTruncated()
-   {
-      // Arrange.
-      var sut = new ProcessingLog();
-      var fieldContents = "1234";
-      var fieldSpecification = _fieldSpecification with { Length = 5, Datatype = HL7Datatype.NM_Numeric };
-
-      var message = String.Format(Messages.LogFieldPresent, fieldSpecification.FieldDescription);
-
-      var expectedEntry = new LogEntry(
-         LogLevel.Information,
-         message,
-         _lineNumber,
-         fieldSpecification.FieldDescription,
-         fieldContents);
-
-      // Act.
-      sut.LogFieldPresentButPossiblyTruncated(_lineNumber, fieldSpecification, fieldContents.AsSpan());
-
-      // Assert.
-      sut.First().Should().Be(expectedEntry);
-   }
-
-   [Fact]
-   public void ProcessingLog_LogFieldPresentButPossiblyTruncated_ShouldAddExpectedEntry_WhenFieldWasTruncated()
-   {
-      // Arrange.
-      var sut = new ProcessingLog();
-      var fieldContents = "12345678";
-      var fieldSpecification = _fieldSpecification with { Length = 5, Datatype = HL7Datatype.NM_Numeric };
-
-      var message = String.Format(
-         Messages.LogFieldPresentButTruncated, 
-         fieldSpecification.FieldDescription,
-         fieldSpecification.Length);
-
-      var expectedEntry = new LogEntry(
-         LogLevel.Warning,
-         message,
-         _lineNumber,
-         fieldSpecification.FieldDescription,
-         fieldContents);
-
-      // Act.
-      sut.LogFieldPresentButPossiblyTruncated(_lineNumber, fieldSpecification, fieldContents.AsSpan());
 
       // Assert.
       sut.First().Should().Be(expectedEntry);

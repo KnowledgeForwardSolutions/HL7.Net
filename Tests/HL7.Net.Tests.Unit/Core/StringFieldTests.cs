@@ -155,11 +155,7 @@ public class StringFieldTests
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      var message = String.Format(Messages.LogFieldPresent, _fieldSpecification.FieldDescription);
-
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Information,
-         message,
+      var expectedLogEntry = LogEntry.GetFieldPresentEntry(
          _lineNumber,
          _fieldSpecification.FieldDescription,
          "This is a test...");
@@ -352,6 +348,87 @@ public class StringFieldTests
    [Theory]
    [InlineData(Optionality.Optional)]
    [InlineData(Optionality.Required)]
+   public void StringField_Parse_ShouldReturnNotPresentInstance_WhenFieldIsBeyondEndOfSuppliedFields(Optionality optionality)
+   {
+      // Arrange.
+      var line = "TST|This is a test..".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+      var fieldSpecification = _fieldSpecification with { Optionality = optionality, Sequence = 2 };
+
+      // Act.
+      var field = StringField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      field.Should().Be(StringField.NotPresent);
+   }
+
+   [Fact]
+   public void StringField_Parse_ShouldLogFieldNotPresent_WhenOptionalFieldIsBeyondEndOfSuppliedFields()
+   {
+      // Arrange.
+      var line = "TST|This is a test..".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+      var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Optional, Sequence = 2 };
+
+      var expectedLogEntry = LogEntry.GetOptionalFieldNotPresentEntry(
+         _lineNumber,
+         fieldSpecification.FieldDescription);
+
+      // Act.
+      _ = StringField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      log.Should().HaveCount(1);
+      log.First().Should().Be(expectedLogEntry);
+   }
+
+   [Fact]
+   public void StringField_Parse_ShouldLogRequiredFieldNotPresent_WhenRequiredFieldIsBeyondEndOfSuppliedFields()
+   {
+      // Arrange.
+      var line = "TST|This is a test..".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+      var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Required, Sequence = 2 };
+
+      var expectedLogEntry = LogEntry.GetRequiredFieldNotPresentEntry(
+         _lineNumber,
+         fieldSpecification.FieldDescription);
+
+      // Act.
+      _ = StringField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      log.Should().HaveCount(1);
+      log.First().Should().Be(expectedLogEntry);
+   }
+
+   [Theory]
+   [InlineData(Optionality.Optional)]
+   [InlineData(Optionality.Required)]
    public void StringField_Parse_ShouldReturnNotPresentInstance_WhenFieldIsEmpty(Optionality optionality)
    {
       // Arrange.
@@ -382,12 +459,7 @@ public class StringFieldTests
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      var message = String.Format(
-         Messages.LogFieldNotPresent,
-         _fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Information,
-         message,
+      var expectedLogEntry = LogEntry.GetOptionalFieldNotPresentEntry(
          _lineNumber,
          _fieldSpecification.FieldDescription);
 
@@ -412,14 +484,9 @@ public class StringFieldTests
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
-
       var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Required };
-      var message = String.Format(
-         Messages.LogRequiredFieldNotPresent,
-         _fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Error,
-         message,
+
+      var expectedLogEntry = LogEntry.GetRequiredFieldNotPresentEntry(
          _lineNumber,
          fieldSpecification.FieldDescription);
 
@@ -490,15 +557,9 @@ public class StringFieldTests
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      var message = String.Format(
-         Messages.LogFieldPresentButNull,
-         _fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Information,
-         message,
+      var expectedLogEntry = LogEntry.GetFieldPresentButNullEntry(
          _lineNumber,
-         _fieldSpecification.FieldDescription,
-         GeneralConstants.PresentButNullValue);
+         _fieldSpecification.FieldDescription);
 
       // Act.
       _ = StringField.Parse(

@@ -28,4 +28,56 @@ public record LogEntry(
    String Message,
    Int32 LineNumber,
    String? FieldDescription = null,
-   String? RawData = null);
+   String? RawData = null)
+{
+   internal static LogEntry GetFieldPresentEntry(
+      Int32 lineNumber,
+      String fieldDescription,
+      ReadOnlySpan<Char> fieldContents)
+      => new(
+         LogLevel.Information,
+         String.Format(Messages.LogFieldPresent, fieldDescription),
+         lineNumber,
+         fieldDescription,
+         fieldContents.ToString());
+
+   internal static LogEntry GetFieldPresentButNullEntry(
+      Int32 lineNumber,
+      String fieldDescription)
+      => new(
+         LogLevel.Information,
+         String.Format(Messages.LogFieldPresentButNull, fieldDescription),
+         lineNumber,
+         fieldDescription,
+         GeneralConstants.PresentButNullValue);
+
+   internal static LogEntry GetFieldPresentButTruncatedEntry(
+      Int32 lineNumber,
+      String fieldDescription,
+      Int32 length,
+      ReadOnlySpan<Char> fieldContents)
+      => new(
+         LogLevel.Warning,
+         String.Format(Messages.LogFieldPresentButTruncated, fieldDescription, length),
+         lineNumber,
+         fieldDescription,
+         fieldContents.ToString());
+
+   internal static LogEntry GetOptionalFieldNotPresentEntry(
+      Int32 lineNumber,
+      String fieldDescription)
+      => new(
+         LogLevel.Information,
+         String.Format(Messages.LogFieldNotPresent, fieldDescription),
+         lineNumber,
+         fieldDescription);
+
+   internal static LogEntry GetRequiredFieldNotPresentEntry(
+      Int32 lineNumber,
+      String fieldDescription)
+      => new(
+         LogLevel.Error,
+         String.Format(Messages.LogRequiredFieldNotPresent, fieldDescription),
+         lineNumber,
+         fieldDescription);
+}
