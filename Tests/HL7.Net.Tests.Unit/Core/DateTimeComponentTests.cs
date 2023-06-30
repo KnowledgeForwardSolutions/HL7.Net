@@ -169,11 +169,7 @@ public class DateTimeComponentTests
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       var log = new ProcessingLog();
 
-      var message = String.Format(Messages.LogFieldPresent, _fieldSpecification.FieldDescription);
-
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Information,
-         message,
+      var expectedLogEntry = LogEntry.GetFieldPresentEntry(
          _lineNumber,
          _fieldSpecification.FieldDescription,
          fieldContents);
@@ -306,12 +302,7 @@ public class DateTimeComponentTests
       var log = new ProcessingLog();
       var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Optional, Sequence = 2 };
 
-      var message = String.Format(
-         Messages.LogFieldNotPresent,
-         fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Information,
-         message,
+      var expectedLogEntry = LogEntry.GetOptionalFieldNotPresentEntry(
          _lineNumber,
          fieldSpecification.FieldDescription);
 
@@ -339,12 +330,7 @@ public class DateTimeComponentTests
       var log = new ProcessingLog();
       var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Required, Sequence = 2 };
 
-      var message = String.Format(
-         Messages.LogRequiredFieldNotPresent,
-         fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Error,
-         message,
+      var expectedLogEntry = LogEntry.GetRequiredFieldNotPresentEntry(
          _lineNumber,
          fieldSpecification.FieldDescription);
 
@@ -393,12 +379,7 @@ public class DateTimeComponentTests
       var log = new ProcessingLog();
       var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Optional };
 
-      var message = String.Format(
-         Messages.LogFieldNotPresent,
-         fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Information,
-         message,
+      var expectedLogEntry = LogEntry.GetOptionalFieldNotPresentEntry(
          _lineNumber,
          fieldSpecification.FieldDescription);
 
@@ -422,14 +403,9 @@ public class DateTimeComponentTests
       var line = $"^M".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       var log = new ProcessingLog();
-
       var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Required };
-      var message = String.Format(
-         Messages.LogRequiredFieldNotPresent,
-         fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Error,
-         message,
+
+      var expectedLogEntry = LogEntry.GetRequiredFieldNotPresentEntry(
          _lineNumber,
          fieldSpecification.FieldDescription);
 
@@ -474,15 +450,9 @@ public class DateTimeComponentTests
       var fieldEnumerator = line.ToFields(_encodingDetails.ComponentSeparator, _encodingDetails.EscapeCharacter);
       var log = new ProcessingLog();
 
-      var message = String.Format(
-         Messages.LogFieldPresentButNull,
-         _fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Information,
-         message,
+      var expectedLogEntry = LogEntry.GetFieldPresentButNullEntry(
          _lineNumber,
-         _fieldSpecification.FieldDescription,
-         GeneralConstants.PresentButNullValue);
+         _fieldSpecification.FieldDescription);
 
       // Act.
       _ = DateTimeComponent.Parse(

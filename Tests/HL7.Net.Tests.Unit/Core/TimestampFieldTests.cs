@@ -60,7 +60,8 @@ public class TimestampFieldTests
    public void TimestampField_Parse_ShouldReturnExpectedValue_WhenAllComponentsSupplied()
    {
       // Arrange.
-      var line = "MSH|198808181126^D|asdf".AsSpan();
+      var fieldContents = "198808181126^D";
+      var line = $"MSH|{fieldContents}|asdf".AsSpan();
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
@@ -84,6 +85,34 @@ public class TimestampFieldTests
       field.Timestamp.Should().Be(expectedTimestamp);
       field.DegreeOfPrecision.Should().Be(expectedDegreeOfPrecision);   
       field.Presence.Should().Be(expectedFieldPresence);
+   }
+
+   [Fact]
+   public void TimestampField_Parse_ShouldLogExpectedEntry_WhenAllComponentsSupplied()
+   {
+      // Arrange.
+      var fieldContents = "198808181126^D";
+      var line = $"MSH|{fieldContents}|asdf".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+
+      var expectedLogEntry = LogEntry.GetFieldPresentEntry(
+         _lineNumber,
+         _fieldSpecification.FieldDescription,
+         fieldContents);
+
+      // Act.
+      _ = TimestampField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         _fieldSpecification,
+         _defaultTimezoneOffset,
+         _lineNumber,
+         log);
+
+      // Assert.
+      log.Should().Contain(expectedLogEntry);
    }
 
    [Fact]
@@ -189,14 +218,9 @@ public class TimestampFieldTests
       var log = new ProcessingLog();
       var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Optional, Sequence = 2 };
 
-      var message = String.Format(
-         Messages.LogFieldNotPresent,
-         fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Information,
-         message,
+      var expectedLogEntry = LogEntry.GetOptionalFieldNotPresentEntry(
          _lineNumber,
-         fieldSpecification.FieldDescription);
+         _fieldSpecification.FieldDescription);
 
       // Act.
       _ = TimestampField.Parse(
@@ -223,12 +247,7 @@ public class TimestampFieldTests
       var log = new ProcessingLog();
       var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Required, Sequence = 2 };
 
-      var message = String.Format(
-         Messages.LogRequiredFieldNotPresent,
-         fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Error,
-         message,
+      var expectedLogEntry = LogEntry.GetRequiredFieldNotPresentEntry(
          _lineNumber,
          fieldSpecification.FieldDescription);
 
@@ -281,12 +300,7 @@ public class TimestampFieldTests
       var log = new ProcessingLog();
       var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Optional };
 
-      var message = String.Format(
-         Messages.LogFieldNotPresent,
-         fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Information,
-         message,
+      var expectedLogEntry = LogEntry.GetOptionalFieldNotPresentEntry(
          _lineNumber,
          fieldSpecification.FieldDescription);
 
@@ -312,14 +326,9 @@ public class TimestampFieldTests
       var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
-
       var fieldSpecification = _fieldSpecification with { Optionality = Optionality.Required };
-      var message = String.Format(
-         Messages.LogRequiredFieldNotPresent,
-         fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Error,
-         message,
+
+      var expectedLogEntry = LogEntry.GetRequiredFieldNotPresentEntry(
          _lineNumber,
          fieldSpecification.FieldDescription);
 
@@ -368,15 +377,9 @@ public class TimestampFieldTests
       fieldEnumerator.MoveNext();
       var log = new ProcessingLog();
 
-      var message = String.Format(
-         Messages.LogFieldPresentButNull,
-         _fieldSpecification.FieldDescription);
-      var expectedLogEntry = new LogEntry(
-         LogLevel.Information,
-         message,
+      var expectedLogEntry = LogEntry.GetFieldPresentButNullEntry(
          _lineNumber,
-         _fieldSpecification.FieldDescription,
-         GeneralConstants.PresentButNullValue);
+         _fieldSpecification.FieldDescription);
 
       // Act.
       _ = TimestampField.Parse(
@@ -390,6 +393,35 @@ public class TimestampFieldTests
       // Assert.
       log.Should().HaveCount(1);
       log.First().Should().Be(expectedLogEntry);
+   }
+
+   [Fact]
+   public void TimestampField_Parse_ShouldLogExpectedWarning_WhenAdditionalComponentsSupplied()
+   {
+      // Arrange.
+      var fieldContents = "198808181126^D^^1234";
+      var line = $"MSH|{fieldContents}|asdf".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+
+      var expectedLogEntry = new LogEntry(
+         LogLevel.Warning,
+         Messages.AdditionalDataIgnored,
+         _lineNumber,
+         _fieldSpecification.FieldDescription);
+
+      // Act.
+      _ = TimestampField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         _fieldSpecification,
+         _defaultTimezoneOffset,
+         _lineNumber,
+         log);
+
+      // Assert.
+      log.Should().Contain(expectedLogEntry);
    }
 
    #endregion

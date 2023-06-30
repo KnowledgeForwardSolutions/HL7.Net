@@ -7,7 +7,7 @@ public class PersonNameFieldTests
       "PID",
       1,
       "PatientName",
-      26,
+      48,
       HL7Datatype.PN_PersonName,
       Optionality.Required,
       "N");
@@ -146,6 +146,93 @@ public class PersonNameFieldTests
       field.Should().NotBeNull();
 
       field.FamilyName.Value.Should().Be(_familyName);
+      field.GivenName.Value.Should().Be(_givenName);
+      field.MiddleNameOrInitial.Presence.Should().Be(Presence.NotPresent);
+      field.Suffix.Presence.Should().Be(Presence.NotPresent);
+      field.Prefix.Value.Should().Be(_prefix);
+      field.Degree.Presence.Should().Be(Presence.NotPresent);
+   }
+
+   [Fact]
+   public void PersonNameField_Parse_ShouldReturnExpectedValue_WhenFieldContentsExceedFieldLength()
+   {
+      // Arrange.
+      var fieldContents = "12345678901234567890^12345678901234567890^^1234567890^12345^12345";
+      var line = $"PID|{fieldContents}|asdf".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+
+      // Act.
+      var field = PersonNameField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         _fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      field.Should().NotBeNull();
+
+      field.FamilyName.Value.Should().Be("12345678901234567890");
+      field.GivenName.Value.Should().Be("12345678901234567890");
+      field.MiddleNameOrInitial.Presence.Should().Be(Presence.NotPresent);
+      field.Suffix.Value.Should().Be("12345");
+      field.Prefix.Presence.Should().Be(Presence.NotPresent);
+      field.Degree.Presence.Should().Be(Presence.NotPresent);
+   }
+
+   [Fact]
+   public void PersonNameField_Parse_ShouldLogFieldTruncated_WhenFieldContentsExceedFieldLength()
+   {
+      // Arrange.
+      var fieldContents = "12345678901234567890^12345678901234567890^^1234567890^12345^12345";
+      var line = $"PID|{fieldContents}|asdf".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+
+      var expectedLogEntry = LogEntry.GetFieldPresentButTruncatedEntry(
+         _lineNumber,
+         _fieldSpecification.FieldDescription,
+         _fieldSpecification.Length,
+         fieldContents.AsSpan());
+
+      // Act.
+      _ = PersonNameField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         _fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      log.Should().Contain(expectedLogEntry);
+   }
+
+   [Fact]
+   public void PersonNameField_Parse_ShouldCorrectlyHandleEscapedComponentSeparatorCharacters()
+   {
+      // Arrange.
+      var encodingDetails = _encodingDetails with { ComponentSeparator = '\'' };
+      var fieldContents = $"O\\'{_familyName}'{_givenName}'''{_prefix}".AsSpan();
+      var line = $"PID|{fieldContents}|asdf".AsSpan();
+      var fieldEnumerator = line.ToFields(encodingDetails.FieldSeparator, encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+
+      // Act.
+      var field = PersonNameField.Parse(
+         ref fieldEnumerator,
+         encodingDetails,
+         _fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      field.Should().NotBeNull();
+
+      field.FamilyName.Value.Should().Be(@"O'" + _familyName);
       field.GivenName.Value.Should().Be(_givenName);
       field.MiddleNameOrInitial.Presence.Should().Be(Presence.NotPresent);
       field.Suffix.Presence.Should().Be(Presence.NotPresent);
@@ -357,6 +444,34 @@ public class PersonNameFieldTests
       // Assert.
       log.Should().HaveCount(1);
       log.First().Should().Be(expectedLogEntry);
+   }
+
+   [Fact]
+   public void PersonNameField_Parse_ShouldLogExpectedWarning_WhenAdditionalComponentsSupplied()
+   {
+      // Arrange.
+      var fieldContents = $"{_familyName}^{_givenName}^^^^{_degree}^Half-orc^Ninja Assassin";
+      var line = $"PID|{fieldContents}|asdf".AsSpan();
+      var fieldEnumerator = line.ToFields(_encodingDetails.FieldSeparator, _encodingDetails.EscapeCharacter);
+      fieldEnumerator.MoveNext();
+      var log = new ProcessingLog();
+
+      var expectedLogEntry = new LogEntry(
+         LogLevel.Warning,
+         Messages.AdditionalDataIgnored,
+         _lineNumber,
+         _fieldSpecification.FieldDescription);
+
+      // Act.
+      _ = PersonNameField.Parse(
+         ref fieldEnumerator,
+         _encodingDetails,
+         _fieldSpecification,
+         _lineNumber,
+         log);
+
+      // Assert.
+      log.Should().Contain(expectedLogEntry);
    }
 
    #endregion

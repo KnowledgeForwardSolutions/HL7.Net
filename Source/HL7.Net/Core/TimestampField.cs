@@ -86,7 +86,14 @@ public sealed record TimestampField : IPresence
          lineNumber,
          log);
 
+      if (componentEnumerator.MoveNext())
+      {
+         log.LogWarning(Messages.AdditionalDataIgnored, lineNumber, fieldSpecification);
+      }
+
       field.Presence = Presence.Present;
+
+      log.LogFieldPresent(lineNumber, fieldSpecification, fieldEnumerator.Current);
 
       return field;
    }

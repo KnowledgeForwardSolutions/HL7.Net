@@ -64,39 +64,29 @@ public class ProcessingLog : IEnumerable<LogEntry>
    internal void LogFieldPresent(
       Int32 lineNumber,
       FieldSpecification fieldSpecification,
-      ReadOnlySpan<Char> fieldContents)
-      => AddLogEntry(LogEntry.GetFieldPresentEntry(
-         lineNumber, 
+      ReadOnlySpan<Char> fieldContents,
+      Boolean checkTruncated = false)
+   {
+      if (checkTruncated && fieldContents.Length > fieldSpecification.Length)
+      {
+         AddLogEntry(LogEntry.GetFieldPresentButTruncatedEntry(
+            lineNumber,
+            fieldSpecification.FieldDescription,
+            fieldSpecification.Length,
+            fieldContents));
+         return;
+      }
+
+      AddLogEntry(LogEntry.GetFieldPresentEntry(
+         lineNumber,
          fieldSpecification.FieldDescription,
-         fieldContents.ToString()));
+         fieldContents));
+   }
 
    internal void LogFieldPresentButNull(Int32 lineNumber, FieldSpecification fieldSpecification)
       => AddLogEntry(LogEntry.GetFieldPresentButNullEntry(
          lineNumber,
          fieldSpecification.FieldDescription));
-
-   internal void LogFieldPresentButPossiblyTruncated(
-      Int32 lineNumber,
-      FieldSpecification fieldSpecification,
-      ReadOnlySpan<Char> fieldContents)
-   {
-      String message;
-      if (fieldContents.Length > fieldSpecification.Length)
-      {
-         message = String.Format(
-            Messages.LogFieldPresentButTruncated,
-            fieldSpecification.FieldDescription,
-            fieldSpecification.Length);
-         LogWarning(message, lineNumber, fieldSpecification, fieldContents.ToString());
-      }
-      else
-      {
-         message = String.Format(
-            Messages.LogFieldPresent,
-            fieldSpecification.FieldDescription);
-         LogInformation(message, lineNumber, fieldSpecification, fieldContents.ToString());
-      }
-   }
 
    internal void LogInformation(
       String message,

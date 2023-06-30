@@ -32,14 +32,14 @@ public record LogEntry(
 {
    internal static LogEntry GetFieldPresentEntry(
       Int32 lineNumber,
-      String fieldDescription, 
-      String fieldContents)
+      String fieldDescription,
+      ReadOnlySpan<Char> fieldContents)
       => new(
          LogLevel.Information,
          String.Format(Messages.LogFieldPresent, fieldDescription),
          lineNumber,
          fieldDescription,
-         fieldContents);
+         fieldContents.ToString());
 
    internal static LogEntry GetFieldPresentButNullEntry(
       Int32 lineNumber,
@@ -50,6 +50,18 @@ public record LogEntry(
          lineNumber,
          fieldDescription,
          GeneralConstants.PresentButNullValue);
+
+   internal static LogEntry GetFieldPresentButTruncatedEntry(
+      Int32 lineNumber,
+      String fieldDescription,
+      Int32 length,
+      ReadOnlySpan<Char> fieldContents)
+      => new(
+         LogLevel.Warning,
+         String.Format(Messages.LogFieldPresentButTruncated, fieldDescription, length),
+         lineNumber,
+         fieldDescription,
+         fieldContents.ToString());
 
    internal static LogEntry GetOptionalFieldNotPresentEntry(
       Int32 lineNumber,

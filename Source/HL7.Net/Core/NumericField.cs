@@ -56,10 +56,11 @@ public sealed record NumericField : IPresence
          : fieldEnumerator.Current;
       if (Decimal.TryParse(fieldContents, GeneralConstants.NumericValueStyle, null, out var value))
       {
-         log.LogFieldPresentButPossiblyTruncated(
-            lineNumber, 
-            fieldSpecification, 
-            fieldEnumerator.Current);
+         log.LogFieldPresent(
+            lineNumber,
+            fieldSpecification,
+            fieldEnumerator.Current,
+            checkTruncated: true);
          return new NumericField(value);
       }
 

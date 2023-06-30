@@ -61,6 +61,15 @@ namespace HL7.Net {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Segment/composite element contains additional data that was ignored.
+        /// </summary>
+        internal static string AdditionalDataIgnored {
+            get {
+                return ResourceManager.GetString("AdditionalDataIgnored", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Field separator character may not be carriage return (hex 0D).
         /// </summary>
         internal static string InvalidFieldSeparator {
@@ -183,6 +192,15 @@ namespace HL7.Net {
         internal static string LogRequiredFieldNotPresent {
             get {
                 return ResourceManager.GetString("LogRequiredFieldNotPresent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Fatal Error - Field {0} is missing.
+        /// </summary>
+        internal static string MissingFieldSeparator {
+            get {
+                return ResourceManager.GetString("MissingFieldSeparator", resourceCulture);
             }
         }
         

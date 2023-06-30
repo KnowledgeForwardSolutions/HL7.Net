@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AdditionalDataIgnored" xml:space="preserve">
+    <value>Segment/composite element contains additional data that was ignored</value>
+  </data>
   <data name="InvalidFieldSeparator" xml:space="preserve">
     <value>Field separator character may not be carriage return (hex 0D)</value>
   </data>
@@ -158,6 +161,9 @@
   </data>
   <data name="LogRequiredFieldNotPresent" xml:space="preserve">
     <value>Required field {0} is not present</value>
+  </data>
+  <data name="MissingFieldSeparator" xml:space="preserve">
+    <value>Fatal Error - Field {0} is missing</value>
   </data>
   <data name="StringValueIsNullOrWhiteSpace" xml:space="preserve">
     <value>Value is null, String.Empty or all whitespace characters</value>

@@ -77,18 +77,20 @@ public record PersonNameField : IPresence
          return PersonNameField.NotPresent;
       }
 
-      var fieldContents = fieldEnumerator.Current;
-      if (fieldContents.IsPresentButNull())
+      if (fieldEnumerator.Current.IsPresentButNull())
       {
          log.LogFieldPresentButNull(lineNumber, fieldSpecification);
          return PersonNameField.PresentButNull;
       }
 
-      var field = new PersonNameField();
-
+      var fieldContents = fieldEnumerator.Current.Length > fieldSpecification.Length
+         ? fieldEnumerator.Current[..fieldSpecification.Length]
+         : fieldEnumerator.Current;
       var componentEnumerator = fieldContents.ToFields(
          encodingDetails.ComponentSeparator,
          encodingDetails.EscapeCharacter);
+
+      var field = new PersonNameField();
 
       field.FamilyName = StringField.Parse(
          ref componentEnumerator,
@@ -132,9 +134,14 @@ public record PersonNameField : IPresence
          lineNumber,
          log);
 
+      if (componentEnumerator.MoveNext())
+      {
+         log.LogWarning(Messages.AdditionalDataIgnored, lineNumber, fieldSpecification);
+      }
+
       field.Presence = Presence.Present;
 
-      log.LogFieldPresent(lineNumber, fieldSpecification, fieldContents);
+      log.LogFieldPresent(lineNumber, fieldSpecification, fieldEnumerator.Current, checkTruncated: true);
 
       return field;
    }
