@@ -8,7 +8,7 @@ public class DegreeOfPrecisionComponentTests
       1,
       "DegreeOfPrecision",
       1,
-      HL7Datatype.TimestampDegreeOfPrecisionComponent,
+      HL7Datatype.Other_TimestampDegreeOfPrecision,
       Optionality.Optional,
       "N");
    private const Int32 _lineNumber = 10;
@@ -181,7 +181,7 @@ public class DegreeOfPrecisionComponentTests
    [InlineData(" Y")]
    [InlineData("Y ")]
    [InlineData(" Y ")]
-   public void DegreeOfPrecisionComponent_Parse_ShouldReturnNotPresentInstance_WhenFieldContainsAnInvalidTimestampValue(String fieldContents)
+   public void DegreeOfPrecisionComponent_Parse_ShouldReturnNotPresentInstance_WhenFieldContainsAnInvalidValue(String fieldContents)
    {
       // Arrange.
       var line = $"20230608192021.2234^{fieldContents}".AsSpan();
@@ -206,7 +206,7 @@ public class DegreeOfPrecisionComponentTests
    [InlineData(" Y")]
    [InlineData("Y ")]
    [InlineData(" Y ")]
-   public void DegreeOfPrecisionComponent_Parse_ShouldLogError_WhenFieldContainsAnInvalidNumericValue(String fieldContents)
+   public void DegreeOfPrecisionComponent_Parse_ShouldLogError_WhenFieldContainsAnInvalidValue(String fieldContents)
    {
       // Arrange.
       var line = $"20230608192021.2234^{fieldContents}".AsSpan();

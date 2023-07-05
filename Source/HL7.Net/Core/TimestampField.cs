@@ -11,7 +11,7 @@ public sealed record TimestampField : IPresence
    private static readonly List<FieldSpecification> _fieldSpecifications = new()
    {
       new FieldSpecification("TS", 1, "DateTime", 26, HL7Datatype.DateTimeComponent, Optionality.Required, "N"),
-      new FieldSpecification("TS", 2, "DegreeOfPrecision", 1, HL7Datatype.TimestampDegreeOfPrecisionComponent, Optionality.Optional, "N"),
+      new FieldSpecification("TS", 2, "DegreeOfPrecision", 1, HL7Datatype.Other_TimestampDegreeOfPrecision, Optionality.Optional, "N"),
    };
 
    /// <summary>

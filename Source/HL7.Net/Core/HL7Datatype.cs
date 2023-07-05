@@ -1,4 +1,6 @@
-﻿namespace HL7.Net.Core;
+﻿// Ignore Spelling: HL
+
+namespace HL7.Net.Core;
 
 /// <summary>
 ///   Identifies the possible HL7 datatypes.
@@ -27,6 +29,9 @@ public enum HL7Datatype
    TQ_TimingQuantity,
    MO_Money,
    //
+   T0104_VersionID,
+   T0190_AddressType,
+   //
    DateTimeComponent,
-   TimestampDegreeOfPrecisionComponent,
+   Other_TimestampDegreeOfPrecision,
 }

@@ -18,11 +18,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HL7.Net.Core.Tests.Benchmarks", "Tests\HL7.Net.Core.Tests.Benchmarks\HL7.Net.Core.Tests.Benchmarks.csproj", "{681F5061-74E2-4951-8E42-06C2C99C36D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HL7.Net.Core.Tests.Benchmarks", "Tests\HL7.Net.Core.Tests.Benchmarks\HL7.Net.Core.Tests.Benchmarks.csproj", "{681F5061-74E2-4951-8E42-06C2C99C36D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HL7.Net.Tests.Unit", "Tests\HL7.Net.Tests.Unit\HL7.Net.Tests.Unit.csproj", "{A79295D8-57CF-47E7-A2A5-5C90C1913A54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HL7.Net.Tests.Unit", "Tests\HL7.Net.Tests.Unit\HL7.Net.Tests.Unit.csproj", "{A79295D8-57CF-47E7-A2A5-5C90C1913A54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HL7.Net", "Source\HL7.Net\HL7.Net.csproj", "{852AAA5D-2EA4-4A76-B3E1-4897160E3365}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HL7.Net", "Source\HL7.Net\HL7.Net.csproj", "{852AAA5D-2EA4-4A76-B3E1-4897160E3365}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

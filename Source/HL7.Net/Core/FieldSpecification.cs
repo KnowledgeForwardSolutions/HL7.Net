@@ -27,7 +27,7 @@
 ///   Identifies this field may repeat as well as the maximum number of 
 ///   repetitions allowed.
 /// </param>
-internal record FieldSpecification(
+public record FieldSpecification(
    String SegmentID,
    Int32 Sequence,
    String FieldName,

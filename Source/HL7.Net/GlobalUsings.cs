@@ -4,4 +4,5 @@ global using System.Runtime.CompilerServices;
 global using System.Text;
 
 global using HL7.Net.Core;
+global using HL7.Net.Core.Tables;
 global using HL7.Net.Validation;

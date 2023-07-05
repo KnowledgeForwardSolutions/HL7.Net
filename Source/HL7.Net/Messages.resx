@@ -174,6 +174,12 @@
   <data name="UndefinedOptionality" xml:space="preserve">
     <value>Value is not a defined member of the Optionality enumeration.</value>
   </data>
+  <data name="UnrecognizedTableEntry" xml:space="preserve">
+    <value>Field {0} contains a value that is not a recognized value for table {1}</value>
+  </data>
+  <data name="UnrecognizedTableEntryFromString" xml:space="preserve">
+    <value>Value is not a recognized value for table {0}</value>
+  </data>
   <data name="ValueLessThan" xml:space="preserve">
     <value>Value may not be less than {0}</value>
   </data>

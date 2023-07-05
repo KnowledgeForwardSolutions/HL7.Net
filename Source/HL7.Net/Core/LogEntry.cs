@@ -80,4 +80,16 @@ public record LogEntry(
          String.Format(Messages.LogRequiredFieldNotPresent, fieldDescription),
          lineNumber,
          fieldDescription);
+
+   internal static LogEntry GetUnrecognizedTableValueEntry(
+      Int32 lineNumber,
+      HL7Datatype datatype,
+      String fieldDescription,
+      ReadOnlySpan<Char> fieldContents)
+      => new(
+         LogLevel.Error,
+         String.Format(Messages.UnrecognizedTableEntry, fieldDescription, datatype),
+         lineNumber,
+         fieldDescription,
+         fieldContents.ToString());
 }

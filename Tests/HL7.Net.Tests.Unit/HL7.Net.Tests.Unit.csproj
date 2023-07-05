@@ -11,7 +11,8 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.11.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.3" />
+    <PackageReference Include="Moq" Version="4.18.4" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -28,8 +29,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="V2Point2\CompositeTypes\" />
+    <Folder Include="V2Point2\DataTypes\" />
+    <Folder Include="V2Point2\Segments\" />
     <Folder Include="V2Point2\Tables\" />
+    <Folder Include="V2Point3\Tables\" />
   </ItemGroup>
 
 </Project>

@@ -19,7 +19,7 @@
 /// <param name="subComponentSeparator">
 ///   Separates adjacent subcomponents of data fields.
 /// </param>
-internal record EncodingDetails(
+public record EncodingDetails(
    Char FieldSeparator,
    Char ComponentSeparator,
    Char RepetitionSeparator,

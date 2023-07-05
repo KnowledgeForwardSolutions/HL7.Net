@@ -10,9 +10,9 @@ public record PersonNameField : IPresence
 
    private static readonly List<FieldSpecification> _fieldSpecifications = new()
    {
-      new FieldSpecification("PN", 1, "FamilyName", 48, HL7Datatype.ST_String, Optionality.Optional, "N"),
-      new FieldSpecification("PN", 2, "GivenName", 48, HL7Datatype.ST_String, Optionality.Optional, "N"),
-      new FieldSpecification("PN", 3, "MiddleNameOrInitial", 48, HL7Datatype.ST_String, Optionality.Optional, "N"),
+      new FieldSpecification("PN", 1, "Family Name", 48, HL7Datatype.ST_String, Optionality.Optional, "N"),
+      new FieldSpecification("PN", 2, "Given Name", 48, HL7Datatype.ST_String, Optionality.Optional, "N"),
+      new FieldSpecification("PN", 3, "Middle Name or Initial", 48, HL7Datatype.ST_String, Optionality.Optional, "N"),
       new FieldSpecification("PN", 4, "Suffix", 48, HL7Datatype.ST_String, Optionality.Optional, "N"),
       new FieldSpecification("PN", 5, "Prefix", 48, HL7Datatype.ST_String, Optionality.Optional, "N"),
       new FieldSpecification("PN", 6, "Degree", 48, HL7Datatype.ST_String, Optionality.Optional, "N"),

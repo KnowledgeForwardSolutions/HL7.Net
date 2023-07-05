@@ -26,8 +26,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="V2Point2\CompositeTypes\" />
-	  <Folder Include="V2Point2\Tables\" />
+	  <Folder Include="Core\DataTypes\" />
+	  <Folder Include="Core\Segments\" />
+	  <Folder Include="V2Point2\DataTypes\" />
+	  <Folder Include="V2Point2\Segments\" />
 	</ItemGroup>
 
 </Project>

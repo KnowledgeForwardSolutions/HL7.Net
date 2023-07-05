@@ -232,6 +232,24 @@ namespace HL7.Net {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Field {0} contains a value that is not a recognized value for table {1}.
+        /// </summary>
+        internal static string UnrecognizedTableEntry {
+            get {
+                return ResourceManager.GetString("UnrecognizedTableEntry", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value is not a recognized value for table {0}.
+        /// </summary>
+        internal static string UnrecognizedTableEntryFromString {
+            get {
+                return ResourceManager.GetString("UnrecognizedTableEntryFromString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Value may not be less than {0}.
         /// </summary>
         internal static string ValueLessThan {

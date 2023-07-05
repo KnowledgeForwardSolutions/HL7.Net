@@ -3,7 +3,7 @@
 /// <summary>
 ///   Log describing the process of reading or writing an HL7 message.
 /// </summary>
-public class ProcessingLog : IEnumerable<LogEntry>
+public class ProcessingLog : IProcessingLog
 {
    private readonly List<LogEntry> _logs = new();
 
@@ -36,21 +36,21 @@ public class ProcessingLog : IEnumerable<LogEntry>
       }
    }
 
-   internal void LogError(
+   public void LogError(
       String message,
       Int32 lineNumber,
       FieldSpecification? fieldSpecification = null,
       String? rawData = null)
       => AddLogEntry(new LogEntry(LogLevel.Error, message, lineNumber, fieldSpecification?.FieldDescription, rawData));
 
-   internal void LogFatalError(
+   public void LogFatalError(
       String message,
       Int32 lineNumber,
       FieldSpecification? fieldSpecification = null,
       String? rawData = null)
       => AddLogEntry(new LogEntry(LogLevel.FatalError, message, lineNumber, fieldSpecification?.FieldDescription, rawData));
 
-   internal void LogFieldNotPresent(Int32 lineNumber, FieldSpecification fieldSpecification)
+   public void LogFieldNotPresent(Int32 lineNumber, FieldSpecification fieldSpecification)
    {
       if (fieldSpecification.Optionality == Optionality.Required)
       {
@@ -61,7 +61,7 @@ public class ProcessingLog : IEnumerable<LogEntry>
       AddLogEntry(LogEntry.GetOptionalFieldNotPresentEntry(lineNumber, fieldSpecification.FieldDescription));
    }
 
-   internal void LogFieldPresent(
+   public void LogFieldPresent(
       Int32 lineNumber,
       FieldSpecification fieldSpecification,
       ReadOnlySpan<Char> fieldContents,
@@ -83,24 +83,34 @@ public class ProcessingLog : IEnumerable<LogEntry>
          fieldContents));
    }
 
-   internal void LogFieldPresentButNull(Int32 lineNumber, FieldSpecification fieldSpecification)
+   public void LogFieldPresentButNull(Int32 lineNumber, FieldSpecification fieldSpecification)
       => AddLogEntry(LogEntry.GetFieldPresentButNullEntry(
          lineNumber,
          fieldSpecification.FieldDescription));
 
-   internal void LogInformation(
+   public void LogInformation(
       String message,
       Int32 lineNumber,
       FieldSpecification? fieldSpecification = null,
       String? rawData = null)
       => _logs.Add(new LogEntry(LogLevel.Information, message, lineNumber, fieldSpecification?.FieldDescription, rawData));
 
-   internal void LogWarning(
+   public void LogWarning(
       String message,
       Int32 lineNumber,
       FieldSpecification? fieldSpecification = null,
       String? rawData = null)
       => AddLogEntry(new LogEntry(LogLevel.Warning, message, lineNumber, fieldSpecification?.FieldDescription, rawData));
+
+   public void LogUnrecognizedTableValue(
+      Int32 lineNumber,
+      FieldSpecification fieldSpecification,
+      ReadOnlySpan<Char> fieldContents)
+      => AddLogEntry(LogEntry.GetUnrecognizedTableValueEntry(
+         lineNumber,
+         fieldSpecification.Datatype,
+         fieldSpecification.FieldDescription,
+         fieldContents));
 
    IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
 }
